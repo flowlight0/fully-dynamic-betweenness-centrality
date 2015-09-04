@@ -1,0 +1,16 @@
+# -*- python -*-
+
+srcdir= '.'
+blddir= '../bin'
+
+
+def build(bld):
+    bld.recurse('algorithm')
+    
+    bld.stlib(
+        source   = ['common.cpp'],
+        target   = 'my_common')
+
+    from waflib.Tools import waf_unit_test
+    bld.add_post_fun(waf_unit_test.summary)
+    
