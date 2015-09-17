@@ -12,23 +12,7 @@ def build(bld):
         target  = 'algorithm')
 
 
-    bld.stlib(
-        source = [
-            '../../lib/gtest/gtest-all.cpp',
-            '../../lib/gtest/gtest_main.cc'
-        ],
-        target = 'gtest',
-        includes = '../../lib/'
-    )
-
-    bld.program(
-        features = 'test',
-        source   = 'betweenness_centrality_test.cpp',
-        target   = '../../betweenness_centrality_test',
-        uselib   = 'common',
-        use      = ['algorithm', 'my_common', 'gtest'],
-        includes = ['../../lib/', '../']
-    )
+    
 
     
     

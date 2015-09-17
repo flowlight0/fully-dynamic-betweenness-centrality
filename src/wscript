@@ -13,4 +13,21 @@ def build(bld):
 
     from waflib.Tools import waf_unit_test
     bld.add_post_fun(waf_unit_test.summary)
-    
+
+    bld.stlib(
+        source = [
+            '../lib/gtest/gtest-all.cpp',
+            '../lib/gtest/gtest_main.cc'
+        ],
+        target = 'gtest',
+        includes = '../lib/'
+    )
+
+    bld.program(
+        features     = 'test',
+        source       = './cui/betweenness_centrality_test.cpp',
+        target       = '../betweenness_centrality_test',
+        uselib_local = ['algorithm', 'my_common', 'gtest'],
+        lib          = ['pthread'],
+        includes     = ['../lib/', '.']
+    )

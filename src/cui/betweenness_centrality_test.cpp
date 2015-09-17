@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <algorithm>
-#include "betweenness_centrality.hpp"
+#include "algorithm/betweenness_centrality.hpp"
 using namespace std;
 
 class BaseGraphTest : public ::testing::Test {
