@@ -4,34 +4,44 @@
 using namespace std;
 
 namespace betweenness_centrality {
-  DynamicSPT::DynamicSPT(int source, vector<vector<int> > *fadj, vector<vector<int> > *badj, bool store_prev)
+  
+  void DynamicShortestPathTree::Resize(){
+    V = fadj->size();
+    size_t curr_size = distance.size();
+    while (curr_size++ < V){
+      distance.push_back(INF);
+      num_paths.push_back(0);
+      prev_nodes.push_back(vector<int>());
+      color.push_back(WHITE);
+    }
+  }
+  
+  DynamicShortestPathTree::DynamicShortestPathTree(int source, vector<vector<int> > *fadj, vector<vector<int> > *badj, bool store_prev)
     : source(source), fadj(fadj), badj(badj), store_prev(store_prev)
   {
     V = fadj->size();
     distance.resize(V, INF);
-    num_ps.resize(V, 0);
+    num_paths.resize(V, 0);
     color.resize(V, WHITE);
-    if (store_prev){
-      prev_nodes.resize(V);
-    }
-
+    prev_nodes.resize(V);
+    
     queue<int> que;
     distance[source] = 0;
-    num_ps[source] = 1;
+    num_paths[source] = 1;
     que.push(source);
 
     while (!que.empty()){
       int v = que.front(); que.pop();
-      CHECK(v == source || num_ps[v] == 0.0);
+      CHECK(v == source || num_paths[v] == 0.0);
 
       for (int u : badj->at(v)){
         if (distance[u] + 1 == distance[v]){
-          num_ps[v] += num_ps[u];
+          num_paths[v] += num_paths[u];
           if (store_prev){
             prev_nodes[v].push_back(u);
           }
-          CHECK(u != v && 0 <= u && u < V);
-          CHECK(num_ps[v] < std::numeric_limits<float>::max() / 2);
+          CHECK(u != v && 0 <= u && (size_t)u < V);
+          CHECK(num_paths[v] < std::numeric_limits<float>::max() / 2);
         }
       }
 
@@ -44,24 +54,26 @@ namespace betweenness_centrality {
       }
     }
   }
-
-  void DynamicSPT::insertEdge(const vector<pair<int, int> > &es){
+  
+  void DynamicShortestPathTree::InsertEdge(const vector<pair<int, int> > &es){
+    Resize();
+    
     mod = false;
     short max_dist = 0;
     for (const auto &e: es){
-      if (distance[e.first ] < INF) max_dist = max(max_dist, distance[e.first ]);
-      if (distance[e.second] < INF) max_dist = max(max_dist, distance[e.second]);
+      if (distance[e.fst] < INF) max_dist = max(max_dist, distance[e.fst]);
+      if (distance[e.snd] < INF) max_dist = max(max_dist, distance[e.snd]);
     }
 
     // queues[max_dist + 1] will be required.
     vector<queue<int> > queues(max_dist + 2);    
-
+    
     for (const auto &e: es){
-      // if (distance[e.first]  >= distance[e.second] + 1){
-      //   queues[distance[e.second] + 1].push(e.first );
+      // if (distance[e.fst]  >= distance[e.snd] + 1){
+      //   queues[distance[e.snd] + 1].push(e.fst);
       // }
-      if (distance[e.second] >= distance[e.first ] + 1){
-        queues[distance[e.first ] + 1].push(e.second);
+      if (distance[e.snd] >= distance[e.fst ] + 1){
+        queues[distance[e.fst ] + 1].push(e.snd);
       }
     }
 
@@ -81,7 +93,7 @@ namespace betweenness_centrality {
         color[v] = BLACK;
 
         distance[v] = m;
-        num_ps[v]   = 0;
+        num_paths[v]   = 0;
         if (store_prev){
           prev_nodes[v].clear();
         }
@@ -91,7 +103,7 @@ namespace betweenness_centrality {
             if (store_prev){
               prev_nodes[v].push_back(u);
             }
-            num_ps[v] += num_ps[u];
+            num_paths[v] += num_paths[u];
           }
         }
         // DEBUG(badj->at(v));
@@ -114,7 +126,7 @@ namespace betweenness_centrality {
     visited.clear();
   }
 
-  void DynamicSPT::sampleSP(int target, vector<int> &ps){
+  void DynamicShortestPathTree::sampleSP(int target, vector<int> &ps){
     CHECK(validNode(target) && distance[target] != INF);
     ps.clear();
     ps.push_back(target);
@@ -124,13 +136,13 @@ namespace betweenness_centrality {
       
       if (store_prev){
         for (int w : prev_nodes[v]){
-          double weight = getNumber(w) / getNumber(v);
+          double weight = GetNumPaths(w) / GetNumPaths(v);
           choices.emplace_back(w, weight);
         }
       } else {
         for (int w : badj->at(v)){
           if (distance[w] + 1 == distance[v]){
-            double weight = getNumber(w) / getNumber(v);
+            double weight = GetNumPaths(w) / GetNumPaths(v);
             choices.emplace_back(w, weight);
           }
         }
@@ -139,12 +151,12 @@ namespace betweenness_centrality {
 
       double total = 0;
       for (const auto &p : choices){
-        total += p.second;
+        total += p.snd;
       }
 
       if (!(abs(total - 1.0) < 1e-5)){
         for (const auto &p : choices){
-          cerr << p <<" "<< distance[p.first] <<" "<< num_ps[p.first] << endl;
+          cerr << p <<" "<< distance[p.fst] <<" "<< num_paths[p.fst] << endl;
         }
         cerr << total << " " << v << " " << distance[v] << endl;
       }
@@ -153,17 +165,17 @@ namespace betweenness_centrality {
       double r = (double)rand() / RAND_MAX;
       v = -1;
       for (const auto &p : choices){
-        if (r < p.second){
-          v = p.first;
+        if (r < p.snd){
+          v = p.fst;
           break;
         }
-        r -= p.second;
+        r -= p.snd;
       }
       CHECK(v != -1);
     }
     reverse(ps.begin(), ps.end());
   }
-  
+
   void DynamicBetweennessCentralityBergamini::PreCompute(const vector<pair<int, int> > &es, int num_samples_){
     this->num_samples = num_samples_;
     BuildGraph(es);
@@ -175,10 +187,10 @@ namespace betweenness_centrality {
       sources[i] = rand() % V;
       targets[i] = rand() % V;
       // We do not keep predecessor of each node in each shortest path tree.
-      DynamicSPT  spt(sources[i], &G[0], &G[1], false); 
+      DynamicShortestPathTree  spt(sources[i], &G[0], &G[1], false); 
       vector<int> sp;
-
-      if (spt.getDistance(targets[i]) != INF){
+      
+      if (spt.GetDistance(targets[i]) != INF){
         spt.sampleSP(targets[i], sp);
       }
 
@@ -190,22 +202,36 @@ namespace betweenness_centrality {
     }
   }
   
-  void DynamicBetweennessCentralityBergamini::BatchInsert(const vector<pair<int, int> > &es){
-    for (const auto &e : es){
-      G[0][e.first ].push_back(e.second);
-      G[1][e.second].push_back(e.first );
+  void DynamicBetweennessCentralityBergamini::BatchInsert(const vector<pair<int, int> > &es_){
+    assert(num_samples >= 1);
+    vector<pair<int, int> > es;
+    for (const auto &e : es_){
+      CHECK(vertex2id.count(e.fst) == 1);
+      CHECK(vertex2id.count(e.snd) == 1);
+      // if (vertex2id.count(e.fst) == 0) vertex2id[e.fst] = V++;
+      // if (vertex2id.count(e.snd) == 0) vertex2id[e.snd] = V++;
+      es.emplace_back(vertex2id[e.fst], vertex2id[e.snd]);
     }
-
+    Resize();
+    
+    CHECK(G[0].size() == V && G[1].size() == V);
+    for (const auto &e : es){
+      CHECK((size_t)e.fst < V && (size_t)e.snd < V);
+      G[0][e.fst].push_back(e.snd);
+      G[1][e.snd].push_back(e.fst);
+    }
+    
+    CHECK(score.size() == V);
     for (int i = 0; i < num_samples; i++){
-      SPTs[i].insertEdge(es);
-      if (SPTs[i].modified() && SPTs[i].getDistance(targets[i]) != INF){
+      SPTs[i].InsertEdge(es);
+      if (SPTs[i].modified() && SPTs[i].GetDistance(targets[i]) != INF){
         vector<int> new_sp;
         SPTs[i].sampleSP(targets[i], new_sp);
 
         for (int v : SPs[i]){
           if (v != sources[i] && v != targets[i]) score[v] -= 1.0 / num_samples;
         }
-
+        
         for (int v : new_sp){
           if (v != sources[i] && v != targets[i]) score[v] += 1.0 / num_samples;
         }
@@ -213,9 +239,18 @@ namespace betweenness_centrality {
       }
     }
   }
-
+  
   void DynamicBetweennessCentralityBergamini::InsertEdge(int u, int v){
     vector<pair<int, int> > es = {make_pair(u, v)};
     BatchInsert(es);
+  }
+  
+  void DynamicBetweennessCentralityBergamini::Resize(){
+    size_t curr_size = score.size();
+    while (curr_size++ < V){
+      score.push_back(0);
+      G[0].push_back(vector<int>());
+      G[1].push_back(vector<int>());
+    }
   }
 }

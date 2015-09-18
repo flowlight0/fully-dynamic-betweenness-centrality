@@ -6,6 +6,7 @@ using namespace std;
 
 namespace betweenness_centrality {
   void BetweennessCentralityBase::BuildGraph(const vector<pair<int, int> > &es){
+    // CHECK(!es.empty());
     vertex2id.clear();
     G[0].clear();
     G[1].clear();
@@ -19,8 +20,18 @@ namespace betweenness_centrality {
     G[0].resize(V);
     G[1].resize(V);
     for (const auto &e : es){
-      G[0][vertex2id[e.fst]].push_back(vertex2id[e.snd]);
-      G[1][vertex2id[e.snd]].push_back(vertex2id[e.fst]);
+      int u = vertex2id[e.fst];
+      int v = vertex2id[e.snd];
+
+      if (u != v){
+        G[0][u].push_back(v);
+        G[1][v].push_back(u);
+      }
+    }
+
+    for (size_t v = 0; v < V; v++){
+      sort(G[0][v].begin(), G[0][v].end());
+      sort(G[1][v].begin(), G[1][v].end());
     }
   }
   

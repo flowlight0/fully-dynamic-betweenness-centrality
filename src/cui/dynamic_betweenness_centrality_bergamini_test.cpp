@@ -33,7 +33,7 @@ template <typename S, typename T> void CheckAccuracy(int V, S *a, T *b, double t
   for (int v = 0; v < V; v++){
     double value_1 = a->QueryCentrality(v);
     double value_2 = b->QueryCentrality(v);
-    EXPECT_NEAR(value_1, value_2, tol * V * V) << v << " " << value_1 << " " << value_2 << endl;
+    EXPECT_NEAR(value_1, value_2, tol * V * V) << v << " " << V << " " << value_1 << " " << value_2 << endl;
   }
 }
 
@@ -63,33 +63,64 @@ TEST(BERGAMINI_ON_GRID_SMALL2, ACCURACY){
   CheckStatic(2 * 10, es);
 }
 
-// TEST(UPDATE, GRID_SMALL){
-//   int H = 7;
-//   int W = 7;
-//   int V = H * W;
-//   auto es    = GenerateGrid(H, W);
-//   auto dummy = vector<pair<int, int> >(1, make_pair(V - 1, V  - 1));
-//   std::random_shuffle(es.begin(), es.end());
+TEST(BERGAMINI_ON_HAND_SMALL0, INSERT){
+  size_t V = 5;
+  vector<pair<int, int> > all_es;
+  all_es.emplace_back(3, 4);
+  all_es.emplace_back(2, 3);
+  all_es.emplace_back(1, 2);
+  all_es.emplace_back(1, 0);  
+  all_es.emplace_back(0, 1);
+  vector<pair<int, int> > es;
+  for (size_t v = 0; v < V; v++){
+    es.emplace_back(v, v);
+  }
+         
+  auto *a = new BetweennessCentralityNaive();
+  auto *b = new DynamicBetweennessCentralityBergamini();
+
+  b->PreCompute(es, 10000);
+  for (const auto &e : all_es){
+    es.push_back(e);
+    a->PreCompute(es);
+    b->InsertEdge(e.fst, e.snd);
+    CheckAccuracy(V, a, b, 0.03);
+  }
+  delete a;
+  delete b;
+}
+
+
+TEST(BERGAMINI_ON_GRID_SMALL0, INSERT){
+  size_t H = 7;
+  size_t W = 7;
+  size_t V = H * W;
+  vector<pair<int, int> > es = GenerateGrid(H, W);
+  vector<pair<int, int> > start_es;
+  for (size_t v = 0; v < V; v++){
+    start_es.emplace_back(v, v);
+  }
+  std::random_shuffle(es.begin(), es.end());
   
-//   for (int batch_size = 1; batch_size < 10; batch_size++){
-//     auto *a = new BetweennessCentralityNaive();
-//     auto *b = new DynamicBetweennessCentralityBergamini();
-//     a->PreCompute(dummy);
-//     b->PreCompute(dummy, 10000);
+  for (int batch_size = 1; batch_size < 10; batch_size++){
+    auto *a = new BetweennessCentralityNaive();
+    auto *b = new DynamicBetweennessCentralityBergamini();
+    a->PreCompute(start_es);
+    b->PreCompute(start_es, 4000);
     
-//     vector<pair<int, int> > tmp_es = dummy;
-//     for (size_t i = 0; i < es.size(); i += batch_size){
-//       vector<pair<int, int> > add_es;
-//       for (size_t j = i; j < min(es.size(), i + batch_size); j++){
-//         tmp_es.push_back(es[j]);
-//         add_es.push_back(es[j]);
-//       }
+    vector<pair<int, int> > tmp_es = start_es;
+    for (size_t i = 0; i < es.size(); i += batch_size){
+      vector<pair<int, int> > add_es;
+      for (size_t j = i; j < min(es.size(), i + batch_size); j++){
+        tmp_es.push_back(es[j]);
+        add_es.push_back(es[j]);
+      }
       
-//       a->PreCompute(tmp_es);
-//       b->BatchInsert(add_es);
-//       CheckAccuracy(V, a, b, 0.03);
-//     }
-//     delete a;
-//     delete b;
-//   }
-// }
+      a->PreCompute(tmp_es);
+      b->BatchInsert(add_es);
+      CheckAccuracy(V, a, b, 0.03);
+    }
+    delete a;
+    delete b;
+  }
+}

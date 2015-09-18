@@ -18,10 +18,10 @@ namespace betweenness_centrality {
   const Color GRAY  = 1;
   const Color BLACK = 2;
   
-  class DynamicSPT {
-    int V;
+  class DynamicShortestPathTree {
+    size_t V;
     vector<short> distance;
-    vector<float> num_ps;
+    vector<float> num_paths;
     vector<vector<int> > prev_nodes;
     vector<Color> color;
 
@@ -32,20 +32,20 @@ namespace betweenness_centrality {
     bool  mod;
     
   public:
-    DynamicSPT(int source,
-               vector<vector<int> > *fadj,
-               vector<vector<int> > *badj,
-               bool store_prev);
-    virtual ~DynamicSPT(){}
+    DynamicShortestPathTree(int source,
+                            vector<vector<int> > *fadj,
+                            vector<vector<int> > *badj,
+                            bool store_prev);
+    virtual ~DynamicShortestPathTree(){}
     
-    void insertEdge(const vector<pair<int ,int> > &es);
+    void InsertEdge(const vector<pair<int ,int> > &es);
     void sampleSP(int target, vector<int> &sp);
-    inline int getDistance(int v) const { return distance[v]; }
-    inline double getNumber(int v) const { return num_ps[v]; }
+    inline int GetDistance(int v) const { return distance[v]; }
+    inline double GetNumPaths(int v) const { return num_paths[v]; }
     inline bool modified() const { return mod; }
-    size_t getDataSize() const ;
-  private: 
-    inline bool validNode(int v) { return 0 <= v && v < V; }
+  private:
+    void Resize();
+    inline bool validNode(int v) { return 0 <= v && (size_t)v < V; }
   };
   
   class DynamicBetweennessCentralityBergamini : public DynamicBetweennessCentralityBase {
@@ -53,7 +53,7 @@ namespace betweenness_centrality {
     vector<double> score;
     vector<int> sources;
     vector<int> targets;
-    vector<DynamicSPT> SPTs;
+    vector<DynamicShortestPathTree> SPTs;
     vector<vector<int> > SPs;
     
   public:
@@ -69,6 +69,7 @@ namespace betweenness_centrality {
     virtual inline double QueryCentrality(int v) const ;
     // const { return score[v];}
   private:
+    void Resize();
   };
 
   double DynamicBetweennessCentralityBergamini::QueryCentrality(int v) const {
