@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <algorithm>
-#include "algorithm/betweenness_centrality.hpp"
+#include "algorithm/centrality.hpp"
 using namespace std;
 
 class BaseGraphTest : public ::testing::Test {
@@ -10,8 +10,8 @@ protected:
   virtual void SetUp() = 0;
   virtual void TearDown(){};
 
-  template <class BetweennessCentrality>  void Check(double tolerance, int num_samples = -1){
-    BetweennessCentrality bc;
+  template <class Centrality>  void Check(double tolerance, int num_samples = -1){
+    Centrality bc;
     bc.PreCompute(es, num_samples);
     for (int v = 0; v < int(centrality_values.size()); v++){
       ASSERT_NEAR(bc.QueryCentrality(v), centrality_values[v], tolerance) << es << " " << v << endl;
@@ -116,11 +116,11 @@ protected:
 
 
 TEST_F(SMALL0Test, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 TEST_F(SMALL0Test, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample>(1e-3 * num_vs * num_vs, 100000);
+  Check<betweenness_centrality::CentralitySample>(1e-3 * num_vs * num_vs, 100000);
 }
 
 TEST(BETWEENNESS_ON_SMALL0, EXACT_RENAME){
@@ -131,7 +131,7 @@ TEST(BETWEENNESS_ON_SMALL0, EXACT_RENAME){
   es.push_back(make_pair(100, 200));
   es.push_back(make_pair(200, 300));
   es.push_back(make_pair(300, 400));
-  betweenness_centrality::BetweennessCentralityNaive bcn;
+  betweenness_centrality::CentralityNaive bcn;
   bcn.PreCompute(es);
   ASSERT_NEAR((double)bcn.QueryCentrality(000) / 25, 0.00, eps);
   ASSERT_NEAR((double)bcn.QueryCentrality(100) / 25, 0.12, eps);
@@ -142,76 +142,76 @@ TEST(BETWEENNESS_ON_SMALL0, EXACT_RENAME){
 }
 
 TEST_F(SMALL1Test, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 TEST_F(SMALL1Test, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample>(1e-3 * num_vs * num_vs, 100000);
+  Check<betweenness_centrality::CentralitySample>(1e-3 * num_vs * num_vs, 100000);
 }
 
 
 TEST(BETWEENNESS_ON_EMPTY, EXACT){
   const double eps = 1e-6;
   vector<pair<int, int> > es;
-  betweenness_centrality::BetweennessCentralityNaive bcn;
+  betweenness_centrality::CentralityNaive bcn;
   bcn.PreCompute(es);
   ASSERT_NEAR((double)bcn.QueryCentrality(0), 0.00, eps);
 }
 
 typedef LineGraphTest<50, true> BETWEENNESS_ON_DIRECTED_LINE;
 TEST_F(BETWEENNESS_ON_DIRECTED_LINE, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 
 TEST_F(BETWEENNESS_ON_DIRECTED_LINE, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample>(5e-2 * num_vs * num_vs, 100000);
+  Check<betweenness_centrality::CentralitySample>(5e-2 * num_vs * num_vs, 100000);
 }
 
 typedef LineGraphTest<50, false> BETWEENNESS_ON_UNDIRECTED_LINE;
 TEST_F(BETWEENNESS_ON_UNDIRECTED_LINE, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 
 TEST_F(BETWEENNESS_ON_UNDIRECTED_LINE, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample>(5e-2 * num_vs * num_vs, 100000);
+  Check<betweenness_centrality::CentralitySample>(5e-2 * num_vs * num_vs, 100000);
 }
 
 typedef GridGraphTest<3, 3, true > BETWEENNESS_ON_DIRECTED_GRID_TINY;
 TEST_F(BETWEENNESS_ON_DIRECTED_GRID_TINY, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 TEST_F(BETWEENNESS_ON_DIRECTED_GRID_TINY, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
 }
 
 typedef GridGraphTest<3, 3, true > BETWEENNESS_ON_UNDIRECTED_GRID_TINY;
 TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID_TINY, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID_TINY, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
 }
 
 
 typedef GridGraphTest<10, 10, true > BETWEENNESS_ON_DIRECTED_GRID;
 TEST_F(BETWEENNESS_ON_DIRECTED_GRID, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 TEST_F(BETWEENNESS_ON_DIRECTED_GRID, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
 }
 
 typedef GridGraphTest<10, 10, false> BETWEENNESS_ON_UNDIRECTED_GRID;
 TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID, EXACT){
-  Check<betweenness_centrality::BetweennessCentralityNaive>(1e-6);
+  Check<betweenness_centrality::CentralityNaive>(1e-6);
 }
 TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
 }
 

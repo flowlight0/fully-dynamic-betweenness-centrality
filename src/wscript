@@ -25,8 +25,8 @@ def build(bld):
 
     bld.program(
         features     = 'test',
-        source       = './cui/betweenness_centrality_test.cpp',
-        target       = '../betweenness_centrality_test',
+        source       = './cui/centrality_test.cpp',
+        target       = '../centrality_test',
         uselib_local = ['algorithm', 'my_common', 'gtest'],
         lib          = ['pthread'],
         includes     = ['../lib/', '.']
@@ -34,8 +34,8 @@ def build(bld):
 
     bld.program(
         features     = 'test',
-        source       = './cui/dynamic_betweenness_centrality_bergamini_test.cpp',
-        target       = '../dynamic_betweenness_centrality_bergamini_test',
+        source       = './cui/dynamic_centrality_bms_test.cpp',
+        target       = '../dynamic_centrality_bms_test',
         uselib_local = ['algorithm', 'my_common', 'gtest'],
         lib          = ['pthread'],
         includes     = ['../lib/', '.']

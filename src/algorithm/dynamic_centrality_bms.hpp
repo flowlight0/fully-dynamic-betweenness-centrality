@@ -1,9 +1,9 @@
-#ifndef DYNAMIC_BETWEENNESS_CENTRALITY_BERGAMINI_H
-#define DYNAMIC_BETWEENNESS_CENTRALITY_BERGAMINI_H
+#ifndef DYNAMIC_CENTRALITY_BMS_H
+#define DYNAMIC_CENTRALITY_BMS_H
 
 
 #include "common.hpp"
-#include "dynamic_betweenness_centrality.hpp"
+#include "dynamic_centrality.hpp"
 #include <climits>
 #include <cassert>
 #include <algorithm>
@@ -48,7 +48,7 @@ namespace betweenness_centrality {
     inline bool validNode(int v) { return 0 <= v && (size_t)v < V; }
   };
   
-  class DynamicBetweennessCentralityBergamini : public DynamicBetweennessCentralityBase {
+  class DynamicCentralityBMS : public DynamicCentralityBase {
     int num_samples;
     vector<double> score;
     vector<int> sources;
@@ -57,8 +57,8 @@ namespace betweenness_centrality {
     vector<vector<int> > SPs;
     
   public:
-    DynamicBetweennessCentralityBergamini() {}
-    virtual ~DynamicBetweennessCentralityBergamini(){}
+    DynamicCentralityBMS() {}
+    virtual ~DynamicCentralityBMS(){}
     virtual void PreCompute(const vector<pair<int, int> > &es, int num_samples = -1);
     void BatchInsert(const vector<pair<int, int> > &es);
     
@@ -72,7 +72,7 @@ namespace betweenness_centrality {
     void Resize();
   };
 
-  double DynamicBetweennessCentralityBergamini::QueryCentrality(int v) const {
+  double DynamicCentralityBMS::QueryCentrality(int v) const {
     if (vertex2id.count(v)){
       return score[vertex2id.at(v)] * V * V;
     } else {
@@ -81,5 +81,5 @@ namespace betweenness_centrality {
   }
 }
   
-#endif /* DYNAMIC_BETWEENNESS_CENTRALITY_BERGAMINI_H */
+#endif /* DYNAMIC_CENTRALITY_BMS_H */
 

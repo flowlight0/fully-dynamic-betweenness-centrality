@@ -1,4 +1,4 @@
-#include "dynamic_betweenness_centrality_bergamini.hpp"
+#include "dynamic_centrality_bms.hpp"
 #include <queue>
 #include <cassert>
 using namespace std;
@@ -176,7 +176,7 @@ namespace betweenness_centrality {
     reverse(ps.begin(), ps.end());
   }
 
-  void DynamicBetweennessCentralityBergamini::PreCompute(const vector<pair<int, int> > &es, int num_samples_){
+  void DynamicCentralityBMS::PreCompute(const vector<pair<int, int> > &es, int num_samples_){
     this->num_samples = num_samples_;
     BuildGraph(es);
     sources.resize(num_samples);
@@ -202,7 +202,7 @@ namespace betweenness_centrality {
     }
   }
   
-  void DynamicBetweennessCentralityBergamini::BatchInsert(const vector<pair<int, int> > &es_){
+  void DynamicCentralityBMS::BatchInsert(const vector<pair<int, int> > &es_){
     assert(num_samples >= 1);
     vector<pair<int, int> > es;
     for (const auto &e : es_){
@@ -240,12 +240,12 @@ namespace betweenness_centrality {
     }
   }
   
-  void DynamicBetweennessCentralityBergamini::InsertEdge(int u, int v){
+  void DynamicCentralityBMS::InsertEdge(int u, int v){
     vector<pair<int, int> > es = {make_pair(u, v)};
     BatchInsert(es);
   }
   
-  void DynamicBetweennessCentralityBergamini::Resize(){
+  void DynamicCentralityBMS::Resize(){
     size_t curr_size = score.size();
     while (curr_size++ < V){
       score.push_back(0);

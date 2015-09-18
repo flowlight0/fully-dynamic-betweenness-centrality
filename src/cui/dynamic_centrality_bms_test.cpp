@@ -1,27 +1,26 @@
-#include "algorithm/dynamic_betweenness_centrality_bergamini.hpp"
+#include "algorithm/dynamic_centrality_bms.hpp"
 #include "common.hpp"
 #include "gtest/gtest.h"
 #include <memory>
 using namespace betweenness_centrality;
 using namespace std;
 
-
 template <typename T> using Matrix = vector<vector<T> > ;
 
 vector<pair<int, int> > GenerateGrid(int H, int W){
-#define getID(h, w) ((h) * W + (w))
+#define GetID(h, w) ((h) * W + (w))
   
   vector<pair<int, int> > es;
   for (int h = 0; h < H; h++){
     for (int w = 0; w < W; w++){
       if (h + 1 < H){
-        es.emplace_back(getID(h, w), getID(h + 1, w));
-        es.emplace_back(getID(h + 1, w), getID(h, w));
+        es.emplace_back(GetID(h, w), GetID(h + 1, w));
+        es.emplace_back(GetID(h + 1, w), GetID(h, w));
       }
 
       if (w + 1 < W){
-        es.emplace_back(getID(h, w), getID(h, w + 1));
-        es.emplace_back(getID(h, w + 1), getID(h, w));
+        es.emplace_back(GetID(h, w), GetID(h, w + 1));
+        es.emplace_back(GetID(h, w + 1), GetID(h, w));
       }
     }
   }
@@ -39,8 +38,8 @@ template <typename S, typename T> void CheckAccuracy(int V, S *a, T *b, double t
 
 
 void CheckStatic(int V, const vector<pair<int, int> > &es){
-  auto *a = new BetweennessCentralityNaive();
-  auto *b = new DynamicBetweennessCentralityBergamini();
+  auto *a = new CentralityNaive();
+  auto *b = new DynamicCentralityBMS();
   a->PreCompute(es);
   b->PreCompute(es, 10000);
   CheckAccuracy(V, a, b, 0.02);
@@ -48,22 +47,22 @@ void CheckStatic(int V, const vector<pair<int, int> > &es){
   delete b;
 }
 
-TEST(BERGAMINI_ON_GRID_SMALL0, ACCURACY){
+TEST(BMS_ON_GRID_SMALL0, ACCURACY){
   auto es = GenerateGrid(2, 3);
   CheckStatic(2 * 3, es);
 }
 
-TEST(BERGAMINI_ON_GRID_SMALL1, ACCURACY){
+TEST(BMS_ON_GRID_SMALL1, ACCURACY){
   auto es = GenerateGrid(5, 5);
   CheckStatic(5 * 5, es);
 }
 
-TEST(BERGAMINI_ON_GRID_SMALL2, ACCURACY){
+TEST(BMS_ON_GRID_SMALL2, ACCURACY){
   auto es = GenerateGrid(2, 10);
   CheckStatic(2 * 10, es);
 }
 
-TEST(BERGAMINI_ON_HAND_SMALL0, INSERT){
+TEST(BMS_ON_HAND_SMALL0, INSERT){
   size_t V = 5;
   vector<pair<int, int> > all_es;
   all_es.emplace_back(3, 4);
@@ -76,8 +75,8 @@ TEST(BERGAMINI_ON_HAND_SMALL0, INSERT){
     es.emplace_back(v, v);
   }
          
-  auto *a = new BetweennessCentralityNaive();
-  auto *b = new DynamicBetweennessCentralityBergamini();
+  auto *a = new CentralityNaive();
+  auto *b = new DynamicCentralityBMS();
 
   b->PreCompute(es, 10000);
   for (const auto &e : all_es){
@@ -91,7 +90,7 @@ TEST(BERGAMINI_ON_HAND_SMALL0, INSERT){
 }
 
 
-TEST(BERGAMINI_ON_GRID_SMALL0, INSERT){
+TEST(BMS_ON_GRID_SMALL0, INSERT){
   size_t H = 7;
   size_t W = 7;
   size_t V = H * W;
@@ -103,8 +102,8 @@ TEST(BERGAMINI_ON_GRID_SMALL0, INSERT){
   std::random_shuffle(es.begin(), es.end());
   
   for (int batch_size = 1; batch_size < 10; batch_size++){
-    auto *a = new BetweennessCentralityNaive();
-    auto *b = new DynamicBetweennessCentralityBergamini();
+    auto *a = new CentralityNaive();
+    auto *b = new DynamicCentralityBMS();
     a->PreCompute(start_es);
     b->PreCompute(start_es, 4000);
     

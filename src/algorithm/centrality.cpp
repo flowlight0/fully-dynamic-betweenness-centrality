@@ -1,11 +1,11 @@
-#include "betweenness_centrality.hpp"
+#include "centrality.hpp"
 #include <cassert>
 #include <queue>
 #include <algorithm>
 using namespace std;
 
 namespace betweenness_centrality {
-  void BetweennessCentralityBase::BuildGraph(const vector<pair<int, int> > &es){
+  void CentralityBase::BuildGraph(const vector<pair<int, int> > &es){
     // CHECK(!es.empty());
     vertex2id.clear();
     G[0].clear();
@@ -35,7 +35,7 @@ namespace betweenness_centrality {
     }
   }
   
-  void BetweennessCentralityNaive::PreCompute(const vector<pair<int, int> > &es, int) {
+  void CentralityNaive::PreCompute(const vector<pair<int, int> > &es, int) {
     BuildGraph(es);
     centrality_map = vector<double>(V, 0);
     const auto &forward_adj = G[0];

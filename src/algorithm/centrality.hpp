@@ -1,5 +1,5 @@
-#ifndef BETWEENNESS_CENTRALITY_H
-#define BETWEENNESS_CENTRALITY_H
+#ifndef CENTRALITY_H
+#define CENTRALITY_H
 
 #include "common.hpp"
 #include <vector>
@@ -9,7 +9,7 @@ using std::unordered_map;
 
 namespace betweenness_centrality {
 
-  class BetweennessCentralityBase {
+  class CentralityBase {
   protected:
     size_t V;
     size_t E;
@@ -18,12 +18,12 @@ namespace betweenness_centrality {
     void BuildGraph(const vector<std::pair<int, int> > &es);
     
   public:
-    virtual ~BetweennessCentralityBase(){};
+    virtual ~CentralityBase(){};
     virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1) = 0;
     virtual inline double QueryCentrality(int v) const = 0;
   };
   
-  class BetweennessCentralityNaive : public BetweennessCentralityBase {
+  class CentralityNaive : public CentralityBase {
     vector<double> centrality_map;
   public:
     virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1);
@@ -32,7 +32,7 @@ namespace betweenness_centrality {
     }
   };
   
-  class BetweennessCentralitySample : public BetweennessCentralityBase {
+  class CentralitySample : public CentralityBase {
     enum Direction {
       Forward,
       Backward
@@ -54,4 +54,4 @@ namespace betweenness_centrality {
 
 
 
-#endif /* BETWEENNESS_CENTRALITY_H */
+#endif /* CENTRALITY_H */
