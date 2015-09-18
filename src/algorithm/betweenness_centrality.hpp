@@ -1,7 +1,7 @@
 #ifndef BETWEENNESS_CENTRALITY_H
 #define BETWEENNESS_CENTRALITY_H
 
-#include "../common.hpp"
+#include "common.hpp"
 #include <vector>
 #include <unordered_map>
 using std::vector;
@@ -19,20 +19,19 @@ namespace betweenness_centrality {
     
   public:
     virtual ~BetweennessCentralityBase(){};
-    virtual void PreCompute(const vector<std::pair<int, int> > &es) = 0;
+    virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1) = 0;
     virtual inline double QueryCentrality(int v) const = 0;
   };
   
   class BetweennessCentralityNaive : public BetweennessCentralityBase {
     vector<double> centrality_map;
   public:
-    virtual void PreCompute(const vector<std::pair<int, int> > &es);
+    virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1);
     virtual inline double QueryCentrality(int v) const {
       return vertex2id.count(v) ? centrality_map[vertex2id.at(v)] : 0;
     }
   };
   
-  template <int num_samples>
   class BetweennessCentralitySample : public BetweennessCentralityBase {
     enum Direction {
       Forward,
@@ -46,14 +45,13 @@ namespace betweenness_centrality {
     vector<int> ComputeDAG(int source, int target);
     void BreadthFirstSearchOnDAG(int source, Direction dir);
   public:
-    virtual void PreCompute(const vector<std::pair<int, int> > &es);
+    virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1);
     virtual inline double QueryCentrality(int v) const {
       return vertex2id.count(v) ? centrality_map[vertex2id.at(v)] : 0;
     }
   };
 };
 
-#include "betweenness_centrality_sample.hpp"
 
 
 #endif /* BETWEENNESS_CENTRALITY_H */

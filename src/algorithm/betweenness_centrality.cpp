@@ -24,7 +24,7 @@ namespace betweenness_centrality {
     }
   }
   
-  void BetweennessCentralityNaive::PreCompute(const vector<pair<int, int> > &es) {
+  void BetweennessCentralityNaive::PreCompute(const vector<pair<int, int> > &es, int) {
     BuildGraph(es);
     centrality_map = vector<double>(V, 0);
     const auto &forward_adj = G[0];

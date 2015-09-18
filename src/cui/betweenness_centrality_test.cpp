@@ -9,9 +9,10 @@ protected:
   vector<double> centrality_values;
   virtual void SetUp() = 0;
   virtual void TearDown(){};
-  template <class BetweennessCentrality>  void Check(double tolerance){
+
+  template <class BetweennessCentrality>  void Check(double tolerance, int num_samples = -1){
     BetweennessCentrality bc;
-    bc.PreCompute(es);
+    bc.PreCompute(es, num_samples);
     for (int v = 0; v < int(centrality_values.size()); v++){
       ASSERT_NEAR(bc.QueryCentrality(v), centrality_values[v], tolerance) << es << " " << v << endl;
     }
@@ -119,7 +120,7 @@ TEST_F(SMALL0Test, EXACT){
 }
 TEST_F(SMALL0Test, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample<100000> >(1e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::BetweennessCentralitySample>(1e-3 * num_vs * num_vs, 100000);
 }
 
 TEST(BETWEENNESS_ON_SMALL0, EXACT_RENAME){
@@ -145,7 +146,7 @@ TEST_F(SMALL1Test, EXACT){
 }
 TEST_F(SMALL1Test, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample<100000> >(1e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::BetweennessCentralitySample>(1e-3 * num_vs * num_vs, 100000);
 }
 
 
@@ -164,7 +165,7 @@ TEST_F(BETWEENNESS_ON_DIRECTED_LINE, EXACT){
 
 TEST_F(BETWEENNESS_ON_DIRECTED_LINE, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample<100000> >(5e-2 * num_vs * num_vs);
+  Check<betweenness_centrality::BetweennessCentralitySample>(5e-2 * num_vs * num_vs, 100000);
 }
 
 typedef LineGraphTest<50, false> BETWEENNESS_ON_UNDIRECTED_LINE;
@@ -174,7 +175,7 @@ TEST_F(BETWEENNESS_ON_UNDIRECTED_LINE, EXACT){
 
 TEST_F(BETWEENNESS_ON_UNDIRECTED_LINE, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::BetweennessCentralitySample<100000> >(5e-2 * num_vs * num_vs);
+  Check<betweenness_centrality::BetweennessCentralitySample>(5e-2 * num_vs * num_vs, 100000);
 }
 
 typedef GridGraphTest<3, 3, true > BETWEENNESS_ON_DIRECTED_GRID_TINY;

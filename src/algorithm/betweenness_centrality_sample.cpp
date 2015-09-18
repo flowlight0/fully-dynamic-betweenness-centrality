@@ -2,17 +2,15 @@
 #define BETWEENNESS_CENTRALITY_SAMPLE_H
 
 #include "common.hpp"
+#include "betweenness_centrality.hpp"
 #include <cassert>
 #include <queue>
 #include <algorithm>
-using std::vector;
-using std::pair;
-using std::cout;
-using std::endl;
+using namespace std;
 
 namespace betweenness_centrality {
-  template <int num_samples> void BetweennessCentralitySample<num_samples>::
-  PreCompute(const vector<pair<int, int> > &es){
+  void BetweennessCentralitySample::
+  PreCompute(const vector<pair<int, int> > &es, int num_samples){
     BuildGraph(es);
     centrality_map = vector<double>(V, 0);
     temp_on_DAG    = vector<bool>(V, 0);
@@ -54,7 +52,7 @@ namespace betweenness_centrality {
     }
   }
 
-  template <int num_samples> vector<int> BetweennessCentralitySample<num_samples>::
+  vector<int> BetweennessCentralitySample::
   ComputeDAG(int source, int target){
     if (source == target) return vector<int>(1, source);
 
@@ -65,7 +63,7 @@ namespace betweenness_centrality {
     
     int         s_curr = Forward, s_next = Forward + 2;
     int         t_curr = Backward, t_next = Backward + 2;
-    std::queue<int>  que[4];
+    queue<int>  que[4];
     que[s_curr].push(source); temp_distance[s_curr][source] = 0; update_vs[s_curr].push_back(source);
     que[t_curr].push(target); temp_distance[t_curr][target] = 0; update_vs[t_curr].push_back(target);
     
@@ -133,7 +131,7 @@ namespace betweenness_centrality {
     return DAG_vertices;
   }
 
-  template <int num_samples> void BetweennessCentralitySample<num_samples>::
+  void BetweennessCentralitySample::
   BreadthFirstSearchOnDAG(int source, Direction dir){
     assert(temp_on_DAG[source]);
     auto &distance    = temp_distance [dir];

@@ -6,7 +6,9 @@ blddir= '../../bin'
 def build(bld):
     bld.stlib(
         source = [
-            'betweenness_centrality.cpp'
+            'betweenness_centrality.cpp',
+            'betweenness_centrality_sample.cpp',
+            # 'dynamic_betweenness_centrality_bergamini.cpp'
         ],
         includes = ['../'],
         target  = 'algorithm')
