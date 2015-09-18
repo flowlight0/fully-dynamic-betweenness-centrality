@@ -32,11 +32,11 @@ def build(bld):
         includes     = ['../lib/', '.']
     )
 
-    # bld.program(
-    #     features     = 'test',
-    #     source       = './cui/dynamic_betweenness_centrality_bergamini_test.cpp',
-    #     target       = '../dynamic_betweenness_centrality_bergamini_test',
-    #     uselib_local = ['algorithm', 'my_common', 'gtest'],
-    #     lib          = ['pthread'],
-    #     includes     = ['../lib/', '.']
-    # )
+    bld.program(
+        features     = 'test',
+        source       = './cui/dynamic_betweenness_centrality_bergamini_test.cpp',
+        target       = '../dynamic_betweenness_centrality_bergamini_test',
+        uselib_local = ['algorithm', 'my_common', 'gtest'],
+        lib          = ['pthread'],
+        includes     = ['../lib/', '.']
+    )

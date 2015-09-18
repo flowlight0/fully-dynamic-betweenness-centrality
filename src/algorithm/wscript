@@ -8,7 +8,7 @@ def build(bld):
         source = [
             'betweenness_centrality.cpp',
             'betweenness_centrality_sample.cpp',
-            # 'dynamic_betweenness_centrality_bergamini.cpp'
+            'dynamic_betweenness_centrality_bergamini.cpp'
         ],
         includes = ['../'],
         target  = 'algorithm')
