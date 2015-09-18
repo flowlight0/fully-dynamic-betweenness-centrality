@@ -48,17 +48,17 @@ void CheckStatic(int V, const vector<pair<int, int> > &es){
   delete b;
 }
 
-TEST(ACCURACY, GRID_SMALL0){
+TEST(BERGAMINI_ON_GRID_SMALL0, ACCURACY){
   auto es = GenerateGrid(2, 3);
   CheckStatic(2 * 3, es);
 }
 
-TEST(ACCURACY, GRID_SMALL1){
+TEST(BERGAMINI_ON_GRID_SMALL1, ACCURACY){
   auto es = GenerateGrid(5, 5);
   CheckStatic(5 * 5, es);
 }
 
-TEST(ACCURACY, GRID_SMALL2){
+TEST(BERGAMINI_ON_GRID_SMALL2, ACCURACY){
   auto es = GenerateGrid(2, 10);
   CheckStatic(2 * 10, es);
 }
