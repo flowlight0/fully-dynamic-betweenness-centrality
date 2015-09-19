@@ -55,7 +55,7 @@ namespace betweenness_centrality {
         }
       }
       // cerr << "HOGE" << endl;
-      assert(chg_nodes.empty());
+      // assert(chg_nodes.empty());
     }
 
     void DynamicSPT::DeleteEdge(int u, int v){

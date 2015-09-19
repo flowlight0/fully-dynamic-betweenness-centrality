@@ -109,21 +109,21 @@ void InsertEdge(pair<vector<vector<int> >, vector<vector<int> > > &adj_lists,
   }
 }
 
-// void deleteEdge(pair<vector<vector<int> >, vector<vector<int> > > &adj_lists,
-//                  Matrix<int> &adj_matrix,
-//                  SPRIndex *pivot_index,
-//                 int u,
-//                 int v)
-// {
-//   vector<vector<int> > &fadj = adj_lists.first;
-//   vector<vector<int> > &badj = adj_lists.second;
-//   if (adj_matrix[u][v] == 1){
-//     adj_matrix[u][v] = 0;
-//     fadj[u].erase(remove(ALL(fadj[u]), v), fadj[u].end());
-//     badj[v].erase(remove(ALL(badj[v]), u), badj[v].end());
-//     pivot_index->deleteEdge(u, v);
-//   }
-// }
+void DeleteEdge(pair<vector<vector<int> >, vector<vector<int> > > &adj_lists,
+                Matrix<int> &adj_matrix,
+                SPRIndex *pivot_index,
+                int u,
+                int v)
+{
+  vector<vector<int> > &fadj = adj_lists.first;
+  vector<vector<int> > &badj = adj_lists.second;
+  if (adj_matrix[u][v] == 1){
+    adj_matrix[u][v] = 0;
+    fadj[u].erase(remove(fadj[u].begin(), fadj[u].end(), v), fadj[u].end());
+    badj[v].erase(remove(badj[v].begin(), badj[v].end(), u), badj[v].end());
+    pivot_index->DeleteEdge(u, v);
+  }
+}
 
 // void InsertNode(pair<vector<vector<int> >, vector<vector<int> > > &adj_lists,
 //                 Matrix<int> &adj_matrix,
@@ -221,52 +221,63 @@ void EdgeInsertTest(int n, int q, int num_trees){
   }
 }
 
-// void EdgeDeleteTest(int n, int q, int num_trees){
-//   srand(0);
+void EdgeDeleteTest(int n, int q, int num_trees){
+  srand(0);
   
-//   while(q--){
-//     Matrix<int> adj_matrix(GenerateERGraph(n, -1));
-//     REP(i, n) REP(j, n) if (i != j){
-//       adj_matrix[i][j] = 1;
-//     }
-//     auto adj_lists = BuildAdj(adj_matrix);
-//     auto p = BuildIndex(adj_lists.first, adj_lists.second, num_trees);
+  while(q--){
+    Matrix<int> adj_matrix(GenerateERGraph(n, -1));
+    for (int i = 0; i < n; i++){
+      for (int j = 0; j < n; j++){
+        if (i != j){
+          adj_matrix[i][j] = 1;
+        }
+      }
+    }
     
-//     for (int num_edges = n * (n - 1); num_edges > n * n * 0.1; num_edges--){
-//       int s = rand() % n, t = rand() % n;
-//       while (!adj_matrix[s][t]){ s = rand () % n, t = rand() % n; }
+    auto adj_lists = BuildAdj(adj_matrix);
+    auto p = BuildIndex(adj_lists.first, adj_lists.second, num_trees);
+    
+    for (int num_edges = n * (n - 1); num_edges > n * n * 0.1; num_edges--){
+      int s = rand() % n, t = rand() % n;
+      while (!adj_matrix[s][t]){ s = rand () % n, t = rand() % n; }
       
-//       deleteEdge(adj_lists, adj_matrix, p.first, s, t);
-//       Check(adj_matrix, p);
-//     }
-//     delete p.first;
-//   }
-// }
+      DeleteEdge(adj_lists, adj_matrix, p.first, s, t);
+      Check(adj_matrix, p);
+    }
+    delete p.first;
+  }
+}
 
-// void EdgeRandomTest(int n, int q, int num_trees){
-//   srand(0);
-//   while(q--){
-//     Matrix<int> adj_matrix(GenerateERGraph(n, -1));
-//     REP(i, n) REP(j, n) if (i != j){
-//       adj_matrix[i][j] = 1;
-//     }
-//     auto adj_lists = BuildAdj(adj_matrix);
-//     auto p = BuildIndex(adj_lists.first, adj_lists.second, num_trees);
+void EdgeRandomTest(int n, int q, int num_trees){
+  srand(0);
+  while(q--){
+    Matrix<int> adj_matrix(GenerateERGraph(n, -1));
+    for (int i = 0; i < n; i++){
+      for (int j = 0; j < n; j++){
+        if (i != j){
+          adj_matrix[i][j] = 1;
+        }
+      }
+    }
     
-//     REP(c, 20){
-//       int s = rand() % n, t = rand() % n;
-//       while (s == t) {s = rand () % n, t = rand() % n; }
+    auto adj_lists = BuildAdj(adj_matrix);
+    auto p = BuildIndex(adj_lists.first, adj_lists.second, num_trees);
 
-//       if (adj_matrix[s][t]){
-//         deleteEdge(adj_lists, adj_matrix, p.first, s, t);
-//       } else {
-//         InsertEdge(adj_lists, adj_matrix, p.first, s, t);
-//       }
-//       Check(adj_matrix, p);
-//     }
-//     delete p.first;
-//   }
-// }
+
+    for (int c = 0; c < 20; c++){
+      int s = rand() % n, t = rand() % n;
+      while (s == t) {s = rand () % n, t = rand() % n; }
+      
+      if (adj_matrix[s][t]){
+        DeleteEdge(adj_lists, adj_matrix, p.first, s, t);
+      } else {
+        InsertEdge(adj_lists, adj_matrix, p.first, s, t);
+      }
+      Check(adj_matrix, p);
+    }
+    delete p.first;
+  }
+}
 
 
 // void NodeInsertTest(int n, int q, int num_trees){
@@ -340,12 +351,12 @@ TEST(REACHABILITY_STATIC, WITHOUT_TREE_SMALL020){ StaticTest(small_num_nodes, sm
 TEST(REACHABILITY_STATIC, WITHOUT_TREE_SMALL030){ StaticTest(small_num_nodes, small_num_graph, 0.30, 0); }
 TEST(REACHABILITY_STATIC, WITHOUT_TREE_SMALL050){ StaticTest(small_num_nodes, small_num_graph, 0.50, 0); }
 
-// TEST(REACHABILITY_EDGE_INSERT, WITHOUT_TREE_TINY)  { EdgeInsertTest(tiny_num_nodes, tiny_num_graph, 0); }
-// TEST(REACHABILITY_EDGE_INSERT, WITHOUT_TREE_SMALL) { EdgeInsertTest(small_num_nodes, small_num_graph, 0); }
-// TEST(REACHABILITY_EDGE_DELETE, WITHOUT_TREE_TINY)  { EdgeDeleteTest(tiny_num_nodes, tiny_num_graph, 0); }
-// TEST(REACHABILITY_EDGE_DELETE, WITHOUT_TREE_SMALL) { EdgeDeleteTest(small_num_nodes, small_num_graph, 0);}
-// TEST(REACHABILITY_EDGE_RANDOM, WITHOUT_TREE_TINY){ EdgeRandomTest(tiny_num_nodes, tiny_num_graph, 0); }
-// TEST(REACHABILITY_EDGE_RANDOM, WITHOUT_TREE_SMALL){ EdgeRandomTest(small_num_nodes, small_num_graph, 0); }
+TEST(REACHABILITY_EDGE_INSERT, WITHOUT_TREE_TINY)  { EdgeInsertTest(tiny_num_nodes, tiny_num_graph, 0); }
+TEST(REACHABILITY_EDGE_INSERT, WITHOUT_TREE_SMALL) { EdgeInsertTest(small_num_nodes, small_num_graph, 0); }
+TEST(REACHABILITY_EDGE_DELETE, WITHOUT_TREE_TINY)  { EdgeDeleteTest(tiny_num_nodes, tiny_num_graph, 0); }
+TEST(REACHABILITY_EDGE_DELETE, WITHOUT_TREE_SMALL) { EdgeDeleteTest(small_num_nodes, small_num_graph, 0);}
+TEST(REACHABILITY_EDGE_RANDOM, WITHOUT_TREE_TINY){ EdgeRandomTest(tiny_num_nodes, tiny_num_graph, 0); }
+TEST(REACHABILITY_EDGE_RANDOM, WITHOUT_TREE_SMALL){ EdgeRandomTest(small_num_nodes, small_num_graph, 0); }
 
 // TEST(REACHABILITY_NODE_INSERT, WITHOUT_TREE_TINY){ NodeInsertTest(tiny_num_nodes, tiny_num_graph, 0); }
 // TEST(REACHABILITY_NODE_INSERT, WITHOUT_TREE_SMALL){ NodeInsertTest(small_num_nodes, small_num_graph, 0); }
@@ -361,14 +372,14 @@ TEST(REACHABILITY_STATIC, WITH_TREE_SMALL020){ StaticTest(small_num_nodes, small
 TEST(REACHABILITY_STATIC, WITH_TREE_SMALL030){ StaticTest(small_num_nodes, small_num_graph, 0.30, 5); }
 TEST(REACHABILITY_STATIC, WITH_TREE_SMALL050){ StaticTest(small_num_nodes, small_num_graph, 0.50, 5); }
 
-// TEST(REACHABILITY_EDGE_INSERT, WITH_TREE_TINY){ EdgeInsertTest(tiny_num_nodes, tiny_num_graph, 1); }
-// TEST(REACHABILITY_EDGE_INSERT, WITH_TREE_SMALL){ EdgeInsertTest(small_num_nodes, small_num_graph, 5); }
-// TEST(REACHABILITY_EDGE_DELETE, WITH_TREE_TINY){ EdgeDeleteTest(tiny_num_nodes, tiny_num_graph, 1); }
-// TEST(REACHABILITY_EDGE_DELETE, WITH_TREE_SMALL){ EdgeDeleteTest(small_num_nodes, small_num_graph, 5); }
-// TEST(REACHABILITY_EDGE_DELETE, WITH_TREE_MIDDLE){ EdgeDeleteTest(middle_num_nodes, middle_num_graph, 5); }
-// TEST(REACHABILITY_EDGE_RANDOM, WITH_TREE_TINY){ EdgeRandomTest(tiny_num_nodes, tiny_num_graph, 1); }
-// TEST(REACHABILITY_EDGE_RANDOM, WITH_TREE_SMALL){ EdgeRandomTest(small_num_nodes, small_num_graph, 5); }
-// TEST(REACHABILITY_EDGE_RANDOM, WITH_TREE_MIDDLE){ EdgeRandomTest(middle_num_nodes, middle_num_graph, 5); }
+TEST(REACHABILITY_EDGE_INSERT, WITH_TREE_TINY){ EdgeInsertTest(tiny_num_nodes, tiny_num_graph, 1); }
+TEST(REACHABILITY_EDGE_INSERT, WITH_TREE_SMALL){ EdgeInsertTest(small_num_nodes, small_num_graph, 5); }
+TEST(REACHABILITY_EDGE_DELETE, WITH_TREE_TINY){ EdgeDeleteTest(tiny_num_nodes, tiny_num_graph, 1); }
+TEST(REACHABILITY_EDGE_DELETE, WITH_TREE_SMALL){ EdgeDeleteTest(small_num_nodes, small_num_graph, 5); }
+TEST(REACHABILITY_EDGE_DELETE, WITH_TREE_MIDDLE){ EdgeDeleteTest(middle_num_nodes, middle_num_graph, 5); }
+TEST(REACHABILITY_EDGE_RANDOM, WITH_TREE_TINY){ EdgeRandomTest(tiny_num_nodes, tiny_num_graph, 1); }
+TEST(REACHABILITY_EDGE_RANDOM, WITH_TREE_SMALL){ EdgeRandomTest(small_num_nodes, small_num_graph, 5); }
+TEST(REACHABILITY_EDGE_RANDOM, WITH_TREE_MIDDLE){ EdgeRandomTest(middle_num_nodes, middle_num_graph, 5); }
 
 // TEST(REACHABILITY_NODE_INSERT, WITH_TREE_TINY){ NodeInsertTest(tiny_num_nodes, tiny_num_graph, 1); }
 // TEST(REACHABILITY_NODE_INSERT, WITH_TREE_SMALL){ NodeInsertTest(small_num_nodes, small_num_graph, 5);}
