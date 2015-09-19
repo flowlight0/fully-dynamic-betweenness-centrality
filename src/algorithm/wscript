@@ -8,11 +8,25 @@ def build(bld):
         source = [
             'centrality.cpp',
             'centrality_sample.cpp',
-            'dynamic_centrality_bms.cpp'
         ],
         includes = ['../'],
-        target  = 'algorithm')
+        target  = 'algo_static')
 
+
+    bld.stlib(
+        source = [
+            'dynamic_centrality_bms.cpp',
+        ],
+        includes = ['../'],
+        target  = 'algo_bms')
+
+    bld.stlib(
+        source = [
+            'special_purpose_reachability_index.cpp'
+        ],
+        includes = ['../'],
+        target  = 'algo_hay')
+    
 
     
 

@@ -24,19 +24,28 @@ def build(bld):
     )
 
     bld.program(
-        features     = 'test',
-        source       = './cui/centrality_test.cpp',
-        target       = '../centrality_test',
-        uselib_local = ['algorithm', 'my_common', 'gtest'],
-        lib          = ['pthread'],
-        includes     = ['../lib/', '.']
+        features = 'test',
+        source   = './cui/centrality_test.cpp',
+        target   = '../centrality_test',
+        use      = ['algo_static', 'my_common', 'gtest'],
+        lib      = ['pthread'],
+        includes = ['../lib/', '.']
     )
 
     bld.program(
         features     = 'test',
         source       = './cui/dynamic_centrality_bms_test.cpp',
         target       = '../dynamic_centrality_bms_test',
-        uselib_local = ['algorithm', 'my_common', 'gtest'],
+        use          = ['algo_static', 'algo_bms', 'my_common', 'gtest'],
+        lib          = ['pthread'],
+        includes     = ['../lib/', '.']
+    )
+
+    bld.program(
+        features     = 'test',
+        source       = './cui/special_purpose_reachability_test.cpp',
+        target       = '../special_purpose_reachability_test',
+        use          = ['algo_static', 'algo_hay', 'my_common', 'gtest'],
         lib          = ['pthread'],
         includes     = ['../lib/', '.']
     )
