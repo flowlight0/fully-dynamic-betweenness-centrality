@@ -33,12 +33,14 @@ namespace betweenness_centrality {
       E = 0;
       G[0].resize(V);
       G[1].resize(V);
+      vertex2id[0] = 0;
     }
 
     for (size_t v = 0; v < V; v++){
       sort(G[0][v].begin(), G[0][v].end());
       sort(G[1][v].begin(), G[1][v].end());
     }
+    CHECK(V == vertex2id.size());
   }
   
   void CentralityNaive::PreCompute(const vector<pair<int, int> > &es, int) {

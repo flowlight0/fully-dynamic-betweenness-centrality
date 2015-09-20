@@ -2,13 +2,13 @@
 #include "algorithm/dynamic_centrality_hay.hpp"
 #include "algorithm/dynamic_centrality_naive.hpp"
 #include "gtest/gtest.h"
+#include <string>
 using namespace betweenness_centrality;
 using namespace std;
 
 inline void CheckError(CentralityBase *a, CentralityBase *b, int V, double error_threshold){
   for (int v = 0; v < V; v++){
-    ASSERT_NEAR(a->QueryCentrality(v), b->QueryCentrality(v), error_threshold)
-      << v << " " << V << endl;;
+    ASSERT_NEAR(a->QueryCentrality(v), b->QueryCentrality(v), error_threshold) << v << " " << V << endl;
   }
 }
 
@@ -35,7 +35,7 @@ void TestUpdate(DynamicCentralityBase *a, DynamicCentralityBase *b, const vector
   for (const auto &e : es){
     G[e.fst].push_back(e.snd);
   }
-   
+  
   const double tolerance = 1e-5;
   a->PreCompute(es, -1);
   b->PreCompute(es, -1);
@@ -67,12 +67,12 @@ void TestUpdate(DynamicCentralityBase *a, DynamicCentralityBase *b, const vector
   }
 }
 
-vector<pair<int, int> > RandomGraph(int V, double e_prob, unsigned *seed)
+vector<pair<int, int> > GenerateRandom(int V, double e_prob)
 {
   vector<pair<int, int> > es;
   for (int i = 0; i < V; i++){
     for (int j = 0; j < V; j++){
-      double p = (double)rand_r(seed) / RAND_MAX;
+      double p = (double)rand() / RAND_MAX;
       if (i != j && p < e_prob) es.emplace_back(i, j);
     }
   }
@@ -81,27 +81,25 @@ vector<pair<int, int> > RandomGraph(int V, double e_prob, unsigned *seed)
 
 void TestUpdateOnRandomGraph(int V, int num_graphs, double prob){
   srand(0);
-  unsigned int seed = 0;
   DynamicCentralityNaive dcn;
   DynamicCentralityHAY dch;
   while (num_graphs--){
-    vector<pair<int, int> > es(RandomGraph(V, prob, &seed));
-    cout << es << endl;
+    vector<pair<int, int> > es(GenerateRandom(V, prob));
     TestUpdate(&dcn, &dch, es);
   }
 }
 
-vector<pair<int, int> > GenerateGrid(int H, int W){
+vector<pair<int, int> > GenerateGrid(int H, int W, double prob = 1.0){
 #define GetID(h, w) ((h) * W + (w))
 
   vector<pair<int, int> > es;
   for (int h = 0; h < H; h++) {
     for (int w = 0; w < W; w++){
-      if (h + 1 < H){
+      if (h + 1 < H && (double)rand() / RAND_MAX < prob){
         es.push_back(make_pair(GetID(h, w), GetID(h + 1, w)));
         es.push_back(make_pair(GetID(h + 1, w), GetID(h, w)));
       }
-      if (w + 1 < W){
+      if (w + 1 < W && (double)rand() / RAND_MAX < prob){
         es.push_back(make_pair(GetID(h, w), GetID(h, w + 1)));
         es.push_back(make_pair(GetID(h, w + 1), GetID(h, w)));
       }
@@ -186,5 +184,121 @@ TEST(FAST_SKETCH_BALL_SIZE, TINY_GRID1){ TestVariousBallSize(2, 4); }
 TEST(FAST_SKETCH_BALL_SIZE, TINY_GRID2){ TestVariousBallSize(3, 3); }
 TEST(FAST_SKETCH_BALL_SIZE, SMALL_GRID1){ TestVariousBallSize(4, 4); }
 TEST(FAST_SKETCH_BALL_SIZE, SMALL_GRID2){ TestVariousBallSize(5, 3); }
-TEST(FAST_SKETCH_BALL_SIZE, MIDDLE_GRID1){ TestVariousBallSize(5, 10); }
-TEST(FAST_SKETCH_BALL_SIZE, MIDDLE_GRID2){ TestVariousBallSize(7, 7); }
+// TEST(FAST_SKETCH_BALL_SIZE, MIDDLE_GRID1){ TestVariousBallSize(5, 10); }
+// TEST(FAST_SKETCH_BALL_SIZE, MIDDLE_GRID2){ TestVariousBallSize(7, 7); }
+
+
+void NodeInsertTest(int n, int num_samples, int trials, double thres, string graph_type){
+  srand(0);
+  while (trials--){
+    vector<pair<int, int> > es =
+      graph_type == "grid"   ?  GenerateGrid(n, n, 0.1) :
+      graph_type == "random" ?  GenerateRandom(n, 0.1) : vector<pair<int, int> > ();
+    int V =
+      graph_type == "grid"   ?  n * n :
+      graph_type == "random" ?  n : 0;
+    
+    DynamicCentralityHAY bch;
+    bch.PreCompute(es, num_samples);
+    
+    for (int c = 0; c < 5; c++){
+      bch.InsertNode(0);
+      bch.InsertNode(n + c);
+      bch.InsertEdge(0, n + c);
+      bch.InsertEdge(n + c, 0);
+      es.emplace_back(0, n + c);
+      es.emplace_back(n + c, 0);
+      DynamicCentralityNaive bcn;
+      bcn.PreCompute(es, num_samples);
+      CheckError(&bcn, &bch, n + c + 1, thres * V * V);
+    }
+  }
+}
+
+
+
+// template <typename GraphGenerator>
+// void NodeDeleteTest(int n, int m, int trials, double thres){
+//   srand(0);
+//   while (trials--){
+//     vector<pair<int, int> > es = GraphGenerator::generate(n, 0.1);
+//     DynamicSketch *a = new DynamicSketch();
+//     a->precompute(es, m);
+    
+//     vector<int> active(n, true);
+//     REP(c, n * 0.7){
+//       int u = rand() % n;
+//       while (!active[u]) u = rand() % n;
+//       active[u] = false;
+//       a->deleteNode(u);
+      
+//       vector<pair<int, int> > tmp_es; // dummy
+//       int largest_node = 0;
+//       for (auto &e: es) {
+//         if (e.first != u && e.second != u){
+//           tmp_es.push_back(e);
+//           largest_node = max({largest_node, e.first, e.second});
+//         }
+//       }
+//       if (largest_node < n - 1) tmp_es.push_back(make_pair(n - 1, n - 1));
+//       es = tmp_es;
+      
+//       Naive *b = new Naive();
+//       b->precompute(es, m);
+      
+//       vector<vector<int> > fadj(n), badj(n);
+//       for (auto e : es){
+//         fadj[e.first ].push_back(e.second);
+//         badj[e.second].push_back(e.first );
+//       }
+//       int active_count = count(ALL(active), true);;
+//       REP(v, n){
+//         double scale = m == -1 ? 1.0 : (double)n * n / active_count / active_count;
+//         ASSERT_NEAR(a->queryCentrality(v), b->queryCentrality(v) * scale, thres)
+//           << "graph:  " << fadj << " " << badj << endl
+//           << "node:   " << v << endl
+//           << "exact:  " << centralityVector(b, n + c) << endl
+//           << "approx: " << centralityVector(a, n + c) << endl
+//           << "active: " << active << endl
+//           << a->getCount() << endl;
+//       }
+//       delete b;
+//     }
+//     delete a;
+//   }
+// }
+
+const int NT = 5;
+const int NS = 10;
+const int NM = 30;
+const int GT = 10;
+const int GS = 10;
+const int GM = 3;
+
+TEST(CENTRALITY_NODE_INSERT_DEBUG, TINY_RANDOM)  { NodeInsertTest( 5, -1, 10, 1e-7, "random"); }
+TEST(CENTRALITY_NODE_INSERT_DEBUG, SMALL_RANDOM) { NodeInsertTest(10, -1, 10, 1e-7, "random"); }
+TEST(CENTRALITY_NODE_INSERT_DEBUG, MIDDLE_RANDOM){ NodeInsertTest(30, -1,  5, 1e-7, "random"); }
+TEST(CENTRALITY_NODE_INSERT_DEBUG, TINY_GRID)  { NodeInsertTest( 5, -1, 10, 1e-7, "grid"); }
+TEST(CENTRALITY_NODE_INSERT_DEBUG, SMALL_GRID) { NodeInsertTest(10, -1, 10, 1e-7, "grid"); }
+TEST(CENTRALITY_NODE_INSERT_DEBUG, MIDDLE_GRID){ NodeInsertTest(30, -1,  5, 1e-7, "grid"); }
+
+// TEST(CENTRALITY_NODE_DELETE_DEBUG, TINY_RANDOM)  { NodeDeleteTest<ERGenerator>(NT, -1, GT, 1e-7); }
+// TEST(CENTRALITY_NODE_DELETE_DEBUG, SMALL_RANDOM) { NodeDeleteTest<ERGenerator>(NS, -1, GS, 1e-7); }
+// TEST(CENTRALITY_NODE_DELETE_DEBUG, MIDDLE_RANDOM){ NodeDeleteTest<ERGenerator>(NM, -1, GM, 1e-7); }
+// TEST(CENTRALITY_NODE_DELETE_DEBUG, TINY_GRID)  { NodeDeleteTest<GridGenerator>(NT, -1, GT, 1e-7); }
+// TEST(CENTRALITY_NODE_DELETE_DEBUG, SMALL_GRID) { NodeDeleteTest<GridGenerator>(NS, -1, GS, 1e-7); }
+// TEST(CENTRALITY_NODE_DELETE_DEBUG, MIDDLE_GRID){ NodeDeleteTest<GridGenerator>(NM, -1, GM, 1e-7); }
+
+TEST(CENTRALITY_NODE_INSERT, TINY_RANDOM)  { NodeInsertTest( 5, 10000, 10, 3e-2, "random"); }
+TEST(CENTRALITY_NODE_INSERT, SMALL_RANDOM) { NodeInsertTest(10, 10000, 10, 3e-2, "random"); }
+TEST(CENTRALITY_NODE_INSERT, MIDDLE_RANDOM){ NodeInsertTest(30, 10000,  5, 3e-2, "random"); }
+TEST(CENTRALITY_NODE_INSERT, TINY_GRID)  { NodeInsertTest( 5, 10000, 10, 3e-2, "grid"); }
+TEST(CENTRALITY_NODE_INSERT, SMALL_GRID) { NodeInsertTest(10, 10000, 10, 3e-2, "grid"); }
+TEST(CENTRALITY_NODE_INSERT, MIDDLE_GRID){ NodeInsertTest(30, 10000,  5, 3e-2, "grid"); }
+
+// TEST(CENTRALITY_NODE_DELETE, TINY_RANDOM)  { NodeDeleteTest<ERGenerator>(NT, 5000, GT, 1e-2); }
+// TEST(CENTRALITY_NODE_DELETE, SMALL_RANDOM) { NodeDeleteTest<ERGenerator>(NS, 5000, GS, 1e-2); }
+// TEST(CENTRALITY_NODE_DELETE, MIDDLE_RANDOM){ NodeDeleteTest<ERGenerator>(NM, 5000, GM, 1e-2); }
+// TEST(CENTRALITY_NODE_DELETE, TINY_GRID)  { NodeDeleteTest<GridGenerator>(NT, 5000, GT, 1e-2); }
+// TEST(CENTRALITY_NODE_DELETE, SMALL_GRID) { NodeDeleteTest<GridGenerator>(NS, 5000, GS, 1e-2); }
+// TEST(CENTRALITY_NODE_DELETE, MIDDLE_GRID){ NodeDeleteTest<GridGenerator>(NM, 5000, GM, 1e-2); }

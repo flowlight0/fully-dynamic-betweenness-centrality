@@ -630,7 +630,7 @@ namespace betweenness_centrality {
   }
 
   void HyperEdge::InsertNode(int u){
-    // // ここに来た時点でdch側はすでにグラフを更新している
+    // ここに来た時点でdch側はすでにグラフを更新している
     assert(0 <= u && size_t(u) < dch->G[0].size() && size_t(u) < dch->G[1].size());
     if (is_connected){
       ball_s.InsertNode(u);

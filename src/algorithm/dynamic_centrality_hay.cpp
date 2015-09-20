@@ -24,8 +24,6 @@ namespace betweenness_centrality {
   void DynamicCentralityHAY::Init(){
     spr_index = new SpecialPurposeReachabilityIndex(&G[0], &G[1], 10);
     total_weight = vector<double>(V, 0);
-    active       = vector<int>(V, 1);
-    active_count = V;
     for (int i = 0; i < 2; i++){
       tmp_dist[i]  = vector<int>(V, -1);
       tmp_count[i] = vector<double>(V, 0);
@@ -61,12 +59,8 @@ namespace betweenness_centrality {
     
     BuildGraph(es);
     Init();
-    // cout << debug_mode << " " << G[0] << endl;
-    // for (const auto &p : vertex2id){
-    //   cout << p << endl;
-    // }
+    
     auto vertex_pairs = SampleVertexPairs();
-    // cout << vertex_pairs << endl;
     for (const auto &vp : vertex_pairs){
       hyper_edges.push_back(new HyperEdge(vp.fst, vp.snd, this));
     }
@@ -104,51 +98,50 @@ namespace betweenness_centrality {
   }
 
   bool DynamicCentralityHAY::InsertNodeIntoGraph(int v){
-    size_t new_V = max<size_t>(v + 1, V);
-    if (new_V > V){
-      for (; V < new_V; V++){
+    if (vertex2id.count(v)){
+      return false;
+    } else {
+      CHECK(vertex2id.size() == V);
+      vertex2id[v] = V++;
+
+      while (G[0].size() < vertex2id.size()){
         G[0].push_back(vector<int>());
         G[1].push_back(vector<int>());
         total_weight.push_back(0);
-        active.push_back(false);
         for (int i = 0; i < 2; i++){
           tmp_dist[i].push_back(-1);
           tmp_count[i].push_back(0);
         }
         tmp_passable.push_back(false);
       }
-      CHECK(G[0].size() == size_t(new_V));
+      CHECK(G[0].size() == V);
+      return true;
     }
-    CHECK(!active[v]);
-    active[v] = true;
-    active_count++;
-    CHECK(0 <= v && (size_t)v < new_V);
-    return true;
   }
 
   bool DynamicCentralityHAY::DeleteNodeFromGraph(int u){
-    CHECK(active[u]);
-    active[u] = false;
-    active_count--;
+    // CHECK(active[u]);
+    // active[u] = false;
+    // active_count--;
     
-    vector<int> u_out(G[0][u]);
-    vector<int> u_in(G[1][u]);
+    // vector<int> u_out(G[0][u]);
+    // vector<int> u_in(G[1][u]);
 
-    for (int v : u_out){
-      CHECK(u != v);
-      auto iter = lower_bound(G[1][v].begin(), G[1][v].end(), u);
-      CHECK(iter != G[1][v].end() && *iter == u);
-      G[1][v].erase(iter);
-    }
+    // for (int v : u_out){
+    //   CHECK(u != v);
+    //   auto iter = lower_bound(G[1][v].begin(), G[1][v].end(), u);
+    //   CHECK(iter != G[1][v].end() && *iter == u);
+    //   G[1][v].erase(iter);
+    // }
     
-    for (int v : u_in){
-      CHECK(u != v);
-      auto iter = lower_bound(G[0][v].begin(), G[0][v].end(), u);
-      CHECK(iter != G[0][v].end() && *iter == u);
-      G[0][v].erase(iter);
-    }
-    G[0][u].clear();
-    G[1][u].clear();
+    // for (int v : u_in){
+    //   CHECK(u != v);
+    //   auto iter = lower_bound(G[0][v].begin(), G[0][v].end(), u);
+    //   CHECK(iter != G[0][v].end() && *iter == u);
+    //   G[0][v].erase(iter);
+    // }
+    // G[0][u].clear();
+    // G[1][u].clear();
     return true;
   }
 
@@ -177,43 +170,45 @@ namespace betweenness_centrality {
   }
   
   void DynamicCentralityHAY::InsertNode(int u){
-    CHECK(u >= 0);
-    size_t old_V = V;
     if (InsertNodeIntoGraph(u) && ValidNode(u)){
+      // cout << "VALID INSERTIONN: " << V << " " << G[0] << endl;
+      u = vertex2id[u];
+      CHECK((size_t)u + 1 == V);
       spr_index->InsertNode(u);
+      
       if (debug_mode){
-        
-        for (size_t s = 0; s < V; s++){
-          for (size_t t = 0; t < V; t++){
-            if (s >= old_V || t >= old_V){
+        for (size_t s = 0; s < V; s++)
+          for (size_t t = 0; t < V; t++)
+            if (s >= V - 1 || t >= V - 1)
               hyper_edges.push_back(new HyperEdge(s, t, this));
-            }
-          }
-        }
       } else {
-        CHECK(active_count > 1);
-        double old_n = active_count - 1;
-        double prob1 = old_n / active_count * old_n / active_count;;
-        double prob2 = 1.0 / active_count / active_count;
+        // CHECK(active_count > 1);
+        CHECK(V > 0);
+        double prob1 = (double)(V - 1) / V * (V - 1) / V;;
+        double prob2 = 1.0 / V / V;
+        
+        // cout << prob1 << " " << prob2 << " " << q << endl;
           
         for (auto &e : hyper_edges){
-          // // TEKITO
           int new_source = -1;
           int new_target = -1;
-          if (((double)rand() / RAND_MAX) < prob1) continue;
-          if (((double)rand() / RAND_MAX) < prob2){
-            new_source = new_target = u;
+          double q = (double)rand() / RAND_MAX;
+          if (q < prob1){ // no change
+            continue;
+          } else if (q < prob2 + prob1){
+            new_source = new_target = u; // re-sample pair of same vertices (really low prob.)
           } else {
-            new_source = u;
-            CHECK(old_n > 0);
-            for (new_target = rand() % V; !active[new_target] || new_target == u; ){
+            new_source = new_target = u;
+            CHECK(V > 1u);
+            while (new_target == u){
               new_target = rand() % V;
             }
+            
             if (((double)rand() / RAND_MAX) < 0.5){
               swap(new_source, new_target);
             }
           }
-          delete e;
+          SafeDelete(e);
           e = new HyperEdge(new_source, new_target, this);
         }
       }
@@ -222,38 +217,38 @@ namespace betweenness_centrality {
       }
     }
   }
-
+  
   void DynamicCentralityHAY::DeleteNode(int u){
     // 内部では頂点数の変更を行わないので媒介中心性の値は適当な重みをかける必要あり
     CHECK(0 <= u && (size_t)u < V);
-    vector<int> u_out(G[0].at(u));
-    vector<int> u_in (G[1].at(u));
+    // vector<int> u_out(G[0].at(u));
+    // vector<int> u_in (G[1].at(u));
     
-    if (DeleteNodeFromGraph(u)){
-      spr_index->DeleteNode(u, u_out, u_in);
+    // if (DeleteNodeFromGraph(u)){
+    //   spr_index->DeleteNode(u, u_out, u_in);
       
-      if (debug_mode){
-        for (auto e : hyper_edges) e->DeleteNode(u, u_out, u_in);
-      } else {
-        for (auto &e : hyper_edges){
-          if (e->GetSource() == u || e->GetTarget() == u){
-            CHECK(active_count > 0);
-            int new_source = u;
-            int new_target = u;
-            while (!active[new_target] || !active[new_source]){
-              new_source = rand() % V;
-              new_target = rand() % V;
-            }
-            CHECK(new_target != u && new_source != u);
-            SafeDelete(e);
-            e = new HyperEdge(new_source, new_target, this);
-          } else {
-            e->DeleteNode(u, u_out, u_in);
-          }
-        }
-      }
-      CHECK(total_weight[u] < 1e-9);
-    }
+    //   if (debug_mode){
+    //     for (auto e : hyper_edges) e->DeleteNode(u, u_out, u_in);
+    //   } else {
+    //     for (auto &e : hyper_edges){
+    //       if (e->GetSource() == u || e->GetTarget() == u){
+    //         CHECK(active_count > 0);
+    //         int new_source = u;
+    //         int new_target = u;
+    //         while (!active[new_target] || !active[new_source]){
+    //           new_source = rand() % V;
+    //           new_target = rand() % V;
+    //         }
+    //         CHECK(new_target != u && new_source != u);
+    //         SafeDelete(e);
+    //         e = new HyperEdge(new_source, new_target, this);
+    //       } else {
+    //         e->DeleteNode(u, u_out, u_in);
+    //       }
+    //     }
+    //   }
+    //   CHECK(total_weight[u] < 1e-9);
+    // }
   }
 
 } /* betweenness_centrality */

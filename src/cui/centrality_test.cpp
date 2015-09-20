@@ -165,7 +165,7 @@ TEST_F(BETWEENNESS_ON_DIRECTED_LINE, EXACT){
 
 TEST_F(BETWEENNESS_ON_DIRECTED_LINE, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::CentralitySample>(5e-2 * num_vs * num_vs, 100000);
+  Check<betweenness_centrality::CentralitySample>(3e-2 * num_vs * num_vs, 5000);
 }
 
 typedef LineGraphTest<50, false> BETWEENNESS_ON_UNDIRECTED_LINE;
@@ -175,7 +175,7 @@ TEST_F(BETWEENNESS_ON_UNDIRECTED_LINE, EXACT){
 
 TEST_F(BETWEENNESS_ON_UNDIRECTED_LINE, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::CentralitySample>(5e-2 * num_vs * num_vs, 100000);
+  Check<betweenness_centrality::CentralitySample>(3e-2 * num_vs * num_vs, 5000);
 }
 
 typedef GridGraphTest<3, 3, true > BETWEENNESS_ON_DIRECTED_GRID_TINY;
@@ -184,7 +184,7 @@ TEST_F(BETWEENNESS_ON_DIRECTED_GRID_TINY, EXACT){
 }
 TEST_F(BETWEENNESS_ON_DIRECTED_GRID_TINY, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralitySample>(3e-2 * num_vs * num_vs, 5000);
 }
 
 typedef GridGraphTest<3, 3, true > BETWEENNESS_ON_UNDIRECTED_GRID_TINY;
@@ -193,7 +193,7 @@ TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID_TINY, EXACT){
 }
 TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID_TINY, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralitySample>(3e-2 * num_vs * num_vs, 5000);
 }
 
 
@@ -203,7 +203,7 @@ TEST_F(BETWEENNESS_ON_DIRECTED_GRID, EXACT){
 }
 TEST_F(BETWEENNESS_ON_DIRECTED_GRID, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralitySample>(3e-2 * num_vs * num_vs, 5000);
 }
 
 typedef GridGraphTest<10, 10, false> BETWEENNESS_ON_UNDIRECTED_GRID;
@@ -212,6 +212,6 @@ TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID, EXACT){
 }
 TEST_F(BETWEENNESS_ON_UNDIRECTED_GRID, APPROX){
   int num_vs = centrality_values.size();
-  Check<betweenness_centrality::CentralityNaive>(5e-3 * num_vs * num_vs);
+  Check<betweenness_centrality::CentralitySample>(3e-2 * num_vs * num_vs, 5000);
 }
 

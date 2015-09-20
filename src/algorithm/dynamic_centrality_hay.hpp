@@ -18,8 +18,6 @@ namespace betweenness_centrality {
     bool debug_mode;
     int num_samples;
     int tradeoff_param;
-    int active_count;
-    std::vector<int> active;
     std::vector<double>     total_weight;
     std::vector<HyperEdge*> hyper_edges;
     
