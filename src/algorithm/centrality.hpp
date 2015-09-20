@@ -20,14 +20,14 @@ namespace betweenness_centrality {
   public:
     virtual ~CentralityBase(){};
     virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1) = 0;
-    virtual inline double QueryCentrality(int v) const = 0;
+    virtual double QueryCentrality(int v) const = 0;
   };
   
   class CentralityNaive : public CentralityBase {
     vector<double> centrality_map;
   public:
     virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1);
-    virtual inline double QueryCentrality(int v) const {
+    virtual double QueryCentrality(int v) const {
       return vertex2id.count(v) ? centrality_map[vertex2id.at(v)] : 0;
     }
   };
@@ -46,7 +46,7 @@ namespace betweenness_centrality {
     void BreadthFirstSearchOnDAG(int source, Direction dir);
   public:
     virtual void PreCompute(const vector<std::pair<int, int> > &es, int num_samples = -1);
-    virtual inline double QueryCentrality(int v) const {
+    virtual double QueryCentrality(int v) const {
       return vertex2id.count(v) ? centrality_map[vertex2id.at(v)] : 0;
     }
   };

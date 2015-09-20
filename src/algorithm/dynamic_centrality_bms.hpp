@@ -66,19 +66,12 @@ namespace betweenness_centrality {
     virtual void DeleteNode(int) { assert(false); }
     virtual void InsertEdge(int u, int v);
     virtual void DeleteEdge(int ,int) { assert(false); }
-    virtual inline double QueryCentrality(int v) const ;
-    // const { return score[v];}
+    virtual double QueryCentrality(int v) const {
+      return vertex2id.count(v) ? score[vertex2id.at(v)] * V * V  : 0;
+    }
   private:
     void Resize();
   };
-
-  double DynamicCentralityBMS::QueryCentrality(int v) const {
-    if (vertex2id.count(v)){
-      return score[vertex2id.at(v)] * V * V;
-    } else {
-      return 0;
-    }
-  }
 }
   
 #endif /* DYNAMIC_CENTRALITY_BMS_H */

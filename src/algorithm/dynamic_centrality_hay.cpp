@@ -50,10 +50,8 @@ namespace betweenness_centrality {
   }
   
   void DynamicCentralityHAY::
-  PreCompute(const vector<pair<int, int> > &es, int num_samples_){
-    CHECK(!es.empty());         // To simplify the implementation.
+  PreCompute(const vector<pair<int, int> > &es, int num_samples_){    
     Clear();
-    
     this->num_samples = num_samples_;
     if (num_samples == -1){
       debug_mode = true;
@@ -75,7 +73,7 @@ namespace betweenness_centrality {
   }
 
   // 辺 {s, t}がすでにあった場合は何もせずfalseをかえす
-  inline bool DynamicCentralityHAY::InsertEdgeIntoGraph(int s, int t){
+  bool DynamicCentralityHAY::InsertEdgeIntoGraph(int s, int t){
     auto &f_adj = G[0];
     auto &b_adj = G[1];
     
@@ -91,7 +89,7 @@ namespace betweenness_centrality {
   }
   
   // 辺 {s, t}が存在しない場合何もしないでfalseを返す
-  inline bool DynamicCentralityHAY::DeleteEdgeFromGraph(int s, int t){
+  bool DynamicCentralityHAY::DeleteEdgeFromGraph(int s, int t){
     auto &f_adj = G[0];
     auto &b_adj = G[1];
     auto fiter = lower_bound(f_adj[s].begin(), f_adj[s].end(), t);
@@ -105,7 +103,7 @@ namespace betweenness_centrality {
     } 
   }
 
-  inline bool DynamicCentralityHAY::InsertNodeIntoGraph(int v){
+  bool DynamicCentralityHAY::InsertNodeIntoGraph(int v){
     size_t new_V = max<size_t>(v + 1, V);
     if (new_V > V){
       for (; V < new_V; V++){
@@ -128,7 +126,7 @@ namespace betweenness_centrality {
     return true;
   }
 
-  inline bool DynamicCentralityHAY::DeleteNodeFromGraph(int u){
+  bool DynamicCentralityHAY::DeleteNodeFromGraph(int u){
     CHECK(active[u]);
     active[u] = false;
     active_count--;

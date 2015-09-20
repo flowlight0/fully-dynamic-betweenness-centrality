@@ -220,8 +220,8 @@ namespace betweenness_centrality {
     int         t_curr = 1, t_next = 3;
     queue<int>  que[4];
     vector<int> update[2];
-    que[s_curr].push(s); sketch->tmp_dist[s_curr][s] = 0; update[s_curr].push_back(s);
-    que[t_curr].push(t); sketch->tmp_dist[t_curr][t] = 0; update[t_curr].push_back(t);
+    que[s_curr].push(s); dch->tmp_dist[s_curr][s] = 0; update[s_curr].push_back(s);
+    que[t_curr].push(t); dch->tmp_dist[t_curr][t] = 0; update[t_curr].push_back(t);
     
     bool found = false;
     while (!que[s_curr].empty() && !que[t_curr].empty()){
@@ -232,16 +232,16 @@ namespace betweenness_centrality {
       while (!que[curr].empty()){
         int v = que[curr].front(); que[curr].pop();
         int p = curr % 2;
-        const auto &adj = from_s ? sketch->G[0][v] : sketch->G[1][v];
+        const auto &adj = from_s ? dch->G[0][v] : dch->G[1][v];
         
         for (int w : adj){
-          int &src_d = sketch->tmp_dist[    p][w];
-          int &dst_d = sketch->tmp_dist[1 - p][w];
+          int &src_d = dch->tmp_dist[    p][w];
+          int &dst_d = dch->tmp_dist[1 - p][w];
           if (src_d != -1) continue;
           if (dst_d != -1) found = true;
           que[next].push(w);
           update[p].push_back(w);
-          sketch->tmp_dist[p][w] = sketch->tmp_dist[p][v] + 1;
+          dch->tmp_dist[p][w] = dch->tmp_dist[p][v] + 1;
         }
       }
       if (found) goto LOOP_END;
@@ -253,18 +253,18 @@ namespace betweenness_centrality {
       for (int i = 0; i < 2; i++){
         vector<pair<int, int> > nodes;
         for (auto v : update[i]){
-          nodes.push_back(make_pair(v, sketch->tmp_dist[i][v]));
+          nodes.push_back(make_pair(v, dch->tmp_dist[i][v]));
         }
         if (i == 0){
-          ball_s.Build(nodes, &sketch->G[0], &sketch->G[1]);
+          ball_s.Build(nodes, &dch->G[0], &dch->G[1]);
         } else {
-          ball_t.Build(nodes, &sketch->G[1], &sketch->G[0]);
+          ball_t.Build(nodes, &dch->G[1], &dch->G[0]);
         }
       }
     } 
 
     for (int i = 0; i < 2; i++){
-      for (int v : update[i]) sketch->tmp_dist[i][v] =  -1;
+      for (int v : update[i]) dch->tmp_dist[i][v] =  -1;
     }
     return found;
   }
@@ -280,7 +280,7 @@ namespace betweenness_centrality {
       int v = que.front(); que.pop();
       for (int w : adj[v]){
         int next_dist = dist[v] + 1;
-        if (!sketch->tmp_passable[w]) continue;
+        if (!dch->tmp_passable[w]) continue;
         if (dist[w] == -1){
           dist[w] = next_dist;
           que.push(w);
@@ -305,17 +305,17 @@ namespace betweenness_centrality {
     assert(is_connected);
     scores.clear();
     dists.clear();
-    vector<int>    &dist_s  = sketch->tmp_dist[0];
-    vector<int>    &dist_t  = sketch->tmp_dist[1];
-    vector<double> &count_s = sketch->tmp_count[0];
-    vector<double> &count_t = sketch->tmp_count[1];
+    vector<int>    &dist_s  = dch->tmp_dist[0];
+    vector<int>    &dist_t  = dch->tmp_dist[1];
+    vector<double> &count_s = dch->tmp_count[0];
+    vector<double> &count_t = dch->tmp_count[1];
     
     for (int v : dag_nodes){
-      sketch->tmp_passable[v] = true;
+      dch->tmp_passable[v] = true;
     }
     
-    ComputeNumPaths(source, sketch->G[0], dist_s, count_s);
-    ComputeNumPaths(target, sketch->G[1], dist_t, count_t);
+    ComputeNumPaths(source, dch->G[0], dist_s, count_s);
+    ComputeNumPaths(target, dch->G[1], dist_t, count_t);
     
     double num_paths = count_s[target];
     assert(num_paths > 0);
@@ -330,10 +330,10 @@ namespace betweenness_centrality {
       }
       count_s[v] = count_t[v] = 0;
       dist_s[v] = dist_t[v] = -1;
-      sketch->tmp_passable[v] = false;
+      dch->tmp_passable[v] = false;
     }
 
-    while (ball_s.GetRadius() + ball_t.GetRadius() + sketch->query_ball_size >= distance){
+    while (ball_s.GetRadius() + ball_t.GetRadius() + dch->tradeoff_param >= distance){
       auto &ball = ball_s.GetBallSize() > ball_t.GetBallSize() ? ball_s : ball_t;
       ball.DecreaseRadius();
       
@@ -345,7 +345,7 @@ namespace betweenness_centrality {
     if (!is_connected) return;
     for (const auto p : scores){
       if (p.first != source && p.first != target){
-        sketch->total_weight[p.first] += p.second;
+        dch->total_weight[p.first] += p.second;
       }
     }
   }
@@ -354,19 +354,19 @@ namespace betweenness_centrality {
     if (!is_connected) return;
     for (const auto p : scores){
       if (p.first != source && p.first != target){
-        sketch->total_weight[p.first] -= p.second;
+        dch->total_weight[p.first] -= p.second;
       }
     }
   }
 
-  HyperEdge::HyperEdge(int s, int t, DynamicCentralityHAY *sketch)
-    : is_connected(false), source(s), target(t), sketch(sketch)
+  HyperEdge::HyperEdge(int s, int t, DynamicCentralityHAY *dch)
+    : is_connected(false), source(s), target(t), dch(dch)
   {
     scores.set_empty_key(-1); scores.set_deleted_key(-2);
     dists.set_empty_key(-1); dists.set_deleted_key(-2);
     
     if (s != t){
-      prq = sketch->spr_index->CreateQuerier(s, t);
+      prq = dch->spr_index->CreateQuerier(s, t);
       is_connected = BidirectionalSearch(s, t);
       if (is_connected){
         CalcWeight();
@@ -465,8 +465,8 @@ namespace betweenness_centrality {
     bool u_in_s = ball_s.HasNode(u);
     bool v_in_s = ball_s.HasNode(v);
 
-    int du = u_in_s ? ball_s.GetDistance(u) : sketch->V + 1;
-    int dv = v_in_s ? ball_s.GetDistance(v) : sketch->V + 1;
+    int du = u_in_s ? ball_s.GetDistance(u) : dch->V + 1;
+    int dv = v_in_s ? ball_s.GetDistance(v) : dch->V + 1;
     
     
     if (!v_in_s || du + 1 == dv){
@@ -474,11 +474,11 @@ namespace betweenness_centrality {
       int max_radius = v_in_s ?
         (distance - dv - ball_t.GetRadius()) :
         (distance - du - ball_t.GetRadius());
-      vector<int> &dist_s = sketch->tmp_dist[0];
+      vector<int> &dist_s = dch->tmp_dist[0];
       vector<int>  dag_nodes;
       vector<int>  inter_nodes;
           
-      Explore(v, max_radius, ball_t, sketch->G[0], sketch->G[1],
+      Explore(v, max_radius, ball_t, dch->G[0], dch->G[1],
               dist_s, dag_nodes, inter_nodes);
           
       // compute DAG!
@@ -513,19 +513,19 @@ namespace betweenness_centrality {
     bool u_in_t = ball_t.HasNode(u);
     bool v_in_t = ball_t.HasNode(v);
 
-    int du = u_in_t ? ball_t.GetDistance(u) : sketch->V + 1;
-    int dv = v_in_t ? ball_t.GetDistance(v) : sketch->V + 1;
+    int du = u_in_t ? ball_t.GetDistance(u) : dch->V + 1;
+    int dv = v_in_t ? ball_t.GetDistance(v) : dch->V + 1;
     
     if (!u_in_t || dv + 1 == du){
       
       int max_radius = u_in_t ?
         (distance - du - ball_s.GetRadius()) :
         (distance - dv - ball_s.GetRadius());
-      vector<int> &dist_t = sketch->tmp_dist[0];
+      vector<int> &dist_t = dch->tmp_dist[0];
       vector<int>  dag_nodes;
       vector<int>  inter_nodes;
       
-      Explore(u, max_radius, ball_s, sketch->G[1], sketch->G[0],
+      Explore(u, max_radius, ball_s, dch->G[1], dch->G[0],
               dist_t, dag_nodes, inter_nodes);
           
       // compute DAG!
@@ -558,12 +558,12 @@ namespace betweenness_centrality {
     vector<int> dag_nodes;
     vector<int> inter_nodes1;
     vector<int> inter_nodes2;
-    const auto &fadj = sketch->G[0];
-    const auto &badj = sketch->G[1];
-    vector<int> &dist_s = sketch->tmp_dist[0];
-    vector<int> &dist_t = sketch->tmp_dist[1];
+    const auto &fadj = dch->G[0];
+    const auto &badj = dch->G[1];
+    vector<int> &dist_s = dch->tmp_dist[0];
+    vector<int> &dist_t = dch->tmp_dist[1];
 
-    int max_radius = sketch->query_ball_size;
+    int max_radius = dch->tradeoff_param;
     Explore(u, max_radius, ball_s, badj, fadj, dist_t, dag_nodes, inter_nodes1);
     Explore(v, max_radius, ball_t, fadj, badj, dist_s, dag_nodes, inter_nodes2);
     
@@ -600,13 +600,13 @@ namespace betweenness_centrality {
     if (is_connected){
       // 先にボールを更新する.
       if (ball_s.HasNode(u)){
-        ball_s.SetTempDist(&sketch->tmp_dist[0]);
+        ball_s.SetTempDist(&dch->tmp_dist[0]);
         ball_s.InsertEdge(u, v);
         ball_s.UnsetTempDist();
       }
       
       if (ball_t.HasNode(v)){
-        ball_t.SetTempDist(&sketch->tmp_dist[0]);
+        ball_t.SetTempDist(&dch->tmp_dist[0]);
         ball_t.InsertEdge(v, u);
         ball_t.UnsetTempDist();
       }
@@ -630,8 +630,8 @@ namespace betweenness_centrality {
   }
 
   void HyperEdge::InsertNode(int u){
-    // // ここに来た時点でsketch側はすでにグラフを更新している
-    assert(0 <= u && size_t(u) < sketch->G[0].size() && size_t(u) < sketch->G[1].size());
+    // // ここに来た時点でdch側はすでにグラフを更新している
+    assert(0 <= u && size_t(u) < dch->G[0].size() && size_t(u) < dch->G[1].size());
     if (is_connected){
       ball_s.InsertNode(u);
       ball_t.InsertNode(u);
@@ -667,17 +667,17 @@ namespace betweenness_centrality {
       }
     }
     
-    ball_s.SetTempDist(&sketch->tmp_dist[0]);
+    ball_s.SetTempDist(&dch->tmp_dist[0]);
     ball_s.DeleteEdge(u, v);
     ball_s.UnsetTempDist();
 
-    ball_t.SetTempDist(&sketch->tmp_dist[1]);
+    ball_t.SetTempDist(&dch->tmp_dist[1]);
     ball_t.DeleteEdge(v, u);
     ball_t.UnsetTempDist();
   }
 
   void HyperEdge::DeleteNode(int u, const vector<int> &u_out, const vector<int> &u_in){
-    assert(sketch->G[0][u].empty() && sketch->G[1][u].empty());
+    assert(dch->G[0][u].empty() && dch->G[1][u].empty());
     
     auto u_iter = scores.find(u);
     if (u_iter == scores.end()) return;
@@ -697,11 +697,11 @@ namespace betweenness_centrality {
       CalcWeight(dag_nodes);
       AddWeight();
     }
-    ball_s.SetTempDist(&sketch->tmp_dist[0]);
+    ball_s.SetTempDist(&dch->tmp_dist[0]);
     ball_s.DeleteNode(u, u_out, u_in);
     ball_s.UnsetTempDist();
     
-    ball_t.SetTempDist(&sketch->tmp_dist[1]);
+    ball_t.SetTempDist(&dch->tmp_dist[1]);
     ball_t.DeleteNode(u, u_in, u_out);
     ball_t.UnsetTempDist();
   }

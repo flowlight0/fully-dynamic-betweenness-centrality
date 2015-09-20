@@ -17,7 +17,7 @@ namespace betweenness_centrality {
   public:
     void PreCompute(const vector<pair<int, int> > &es, int num_samples = -1);
   
-    virtual inline double QueryCentrality(int v) const {
+    virtual double QueryCentrality(int v) const {
       return vertex2id.count(v) ? cn.QueryCentrality(vertex2id.at(v)) : 0;
     }
     virtual void InsertNode(int v);

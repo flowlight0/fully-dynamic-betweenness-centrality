@@ -17,7 +17,7 @@ namespace betweenness_centrality {
   private:
     bool debug_mode;
     int num_samples;
-    int query_ball_size;
+    int tradeoff_param;
     int active_count;
     std::vector<int> active;
     std::vector<double>     total_weight;
@@ -39,28 +39,28 @@ namespace betweenness_centrality {
     // void addNewElems(int num_nodes);
     void AddWeight(const HyperEdge *index, bool minus = false);
     
-    inline bool InsertEdgeIntoGraph(int s, int t);
-    inline bool DeleteEdgeFromGraph(int s, int t);
-    inline bool InsertNodeIntoGraph(int v);
-    inline bool DeleteNodeFromGraph(int v);
+    bool InsertEdgeIntoGraph(int s, int t);
+    bool DeleteEdgeFromGraph(int s, int t);
+    bool InsertNodeIntoGraph(int v);
+    bool DeleteNodeFromGraph(int v);
     inline bool ValidNode(int v) const { return vertex2id.count(v); }
     
   public:
-    DynamicCentralityHAY() : debug_mode(false), query_ball_size(0), spr_index(nullptr) { }
+    DynamicCentralityHAY() : debug_mode(false), tradeoff_param(0), spr_index(nullptr) { }
     ~DynamicCentralityHAY(){ Clear(); }
     
     virtual void PreCompute(const vector<pair<int, int> > &es, int num_samples);
     
-    virtual inline double QueryCentrality(int v) const {
+    virtual double QueryCentrality(int v) const {
       return ValidNode(v) ? total_weight[vertex2id.at(v)] / hyper_edges.size() * V * V : 0.0;
     }
     
     virtual void InsertEdge(int s, int t);
     virtual void DeleteEdge(int s, int t);
-    void InsertNode(int v);
-    void DeleteNode(int v);
+    virtual void InsertNode(int v);
+    virtual void DeleteNode(int v);
     
-    // virtual void  setQueryBallSize(int size) { query_ball_size = size;}
+    void SetTradeOffParam(int x) { tradeoff_param = x;}
     friend class HyperEdge;
   };
 };

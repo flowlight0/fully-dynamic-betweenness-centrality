@@ -6,16 +6,16 @@ using namespace std;
 
 namespace betweenness_centrality {
   namespace special_purpose_reachability_index {
-    inline void set_bit(int &number, int pos, bool bit){
+    inline void SetBit(int &number, int pos, bool bit){
       number &= ~(1 << pos);
       number |= (int(bit) << pos);
     }
 
-    inline bool get_bit(int number, int pos){
+    inline bool GetBit(int number, int pos){
       return (number >> pos) & 1;
     }
   
-    DynamicSPT::DynamicSPT(int r, AdjList *fadj, AdjList *badj) : root(r), fadj(fadj), badj(badj)
+    DynamicSPT::DynamicSPT(int r, vector<vector<int> >  *fadj, vector<vector<int> >  *badj) : root(r), fadj(fadj), badj(badj)
     {
       CHECK(ValidNode(r));
       curr_dist.resize(fadj->size(), INF);
@@ -485,7 +485,7 @@ namespace betweenness_centrality {
 
     
   
-    SpecialPurposeReachabilityIndex::SpecialPurposeReachabilityIndex(AdjList *fadj, AdjList *badj, int num_rs)
+    SpecialPurposeReachabilityIndex::SpecialPurposeReachabilityIndex(vector<vector<int> >  *fadj, vector<vector<int> >  *badj, int num_rs)
       : fadj(fadj), badj(badj), num_rs(num_rs)
     {
       CHECK(fadj != nullptr && badj != nullptr && num_rs <= num_rs_limit);
@@ -508,7 +508,7 @@ namespace betweenness_centrality {
 
         for (int v = 0; v < num_nodes; v++){
           for (int i = 0; i < 2; i++){
-            set_bit(reach_mask[i][v], k, spts[i].back()->GetDistance(v) < INF);
+            SetBit(reach_mask[i][v], k, spts[i].back()->GetDistance(v) < INF);
           }
         }
       }
@@ -596,7 +596,7 @@ namespace betweenness_centrality {
 
           for (int v = 0; v < num_nodes; v++){
             for (int i = 0; i < 2; i++){
-              set_bit(reach_mask[i][v], k, spts[i][k]->GetDistance(v) < INF);
+              SetBit(reach_mask[i][v], k, spts[i][k]->GetDistance(v) < INF);
             }
           }
         } else {
@@ -636,13 +636,13 @@ namespace betweenness_centrality {
           const vector<int> *upd_nodes = spts[i][k]->GetDCNodes();
           for (auto it = upd_nodes->begin(); it != upd_nodes->end(); it++){
             int  v         = *it;
-            bool cur_reach = get_bit(reach_mask[i][v], k);
+            bool cur_reach = GetBit(reach_mask[i][v], k);
             bool nxt_reach = spts[i][k]->GetDistance(v) < INF;
             if (cur_reach != nxt_reach && !has_change[v]) {
               chg_nodes.push_back(v);
               has_change[v] = true;
             }
-            set_bit(reach_mask[i][v], k, nxt_reach);
+            SetBit(reach_mask[i][v], k, nxt_reach);
           }
         }
       }

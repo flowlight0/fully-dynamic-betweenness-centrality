@@ -11,22 +11,28 @@ namespace betweenness_centrality {
     G[0].clear();
     G[1].clear();
     
-    V = 0;
-    E = es.size();
-    for (const auto &e : es){
-      if (vertex2id.count(e.fst) == 0) vertex2id[e.fst] = V++;
-      if (vertex2id.count(e.snd) == 0) vertex2id[e.snd] = V++;
-    }
-    G[0].resize(V);
-    G[1].resize(V);
-    for (const auto &e : es){
-      int u = vertex2id[e.fst];
-      int v = vertex2id[e.snd];
-
-      if (u != v){
-        G[0][u].push_back(v);
-        G[1][v].push_back(u);
+    if (!es.empty()){
+      V = 0;
+      E = es.size();
+      for (const auto &e : es){
+        if (vertex2id.count(e.fst) == 0) vertex2id[e.fst] = V++;
+        if (vertex2id.count(e.snd) == 0) vertex2id[e.snd] = V++;
       }
+      G[0].resize(V);
+      G[1].resize(V);
+      for (const auto &e : es){
+        int u = vertex2id[e.fst];
+        int v = vertex2id[e.snd];
+        if (u != v){
+          G[0][u].push_back(v);
+          G[1][v].push_back(u);
+        }
+      }
+    } else {
+      V = 1;
+      E = 0;
+      G[0].resize(V);
+      G[1].resize(V);
     }
 
     for (size_t v = 0; v < V; v++){

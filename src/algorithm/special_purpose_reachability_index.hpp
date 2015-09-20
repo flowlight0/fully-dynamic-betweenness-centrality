@@ -20,14 +20,13 @@ namespace betweenness_centrality {
     
     class SpecialPurposeReachabilityIndex {
     private:
-      typedef vector<vector<int> > AdjList;
       friend class ReachabilityQuerier;
     
       vector<int> roots;
       vector<int> reach_mask[2];
       vector<DynamicSPT*> spts[2];
-      AdjList *fadj;
-      AdjList *badj;
+      vector<vector<int> >  *fadj;
+      vector<vector<int> >  *badj;
     
       vector<int> temp_array;
       vector<int> has_change;
@@ -39,7 +38,7 @@ namespace betweenness_centrality {
     
     public:
     
-      SpecialPurposeReachabilityIndex(AdjList *fadj, AdjList *badj, int num_rs);
+      SpecialPurposeReachabilityIndex(vector<vector<int> >  *fadj, vector<vector<int> >  *badj, int num_rs);
       virtual ~SpecialPurposeReachabilityIndex();
       void InsertEdge(int u, int v);
       void DeleteEdge(int u, int v);
@@ -59,17 +58,15 @@ namespace betweenness_centrality {
 
 
     class DynamicSPT {
-      typedef vector<vector<int> > AdjList;
-      
     private: 
       int root;
       vector<int> curr_dist;
       vector<int> next_dist;
-      AdjList *fadj;
-      AdjList *badj;
+      vector<vector<int> >  *fadj;
+      vector<vector<int> >  *badj;
       vector<int> chg_nodes;
     public:
-      DynamicSPT(int r, AdjList *fadj, AdjList *badj);
+      DynamicSPT(int r, vector<vector<int> >  *fadj, vector<vector<int> >  *badj);
       inline int  GetRoot() const { return root; }
       inline int  GetDistance(int v) { assert(ValidNode(v)); return curr_dist[v]; }
     

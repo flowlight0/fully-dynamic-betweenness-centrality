@@ -63,11 +63,11 @@ namespace betweenness_centrality {
     Ball ball_t;
     hash_map<int, double> scores;
     hash_map<int, int>    dists;
-    DynamicCentralityHAY *sketch;
+    DynamicCentralityHAY *dch;
     special_purpose_reachability_index::ReachabilityQuerier *prq;
     
   public:
-    HyperEdge(int s, int t, DynamicCentralityHAY *sketch);
+    HyperEdge(int s, int t, DynamicCentralityHAY *dch);
     ~HyperEdge(){ if (source != target && is_connected) SubWeight(); };
     void InsertEdge(int s, int t);
     void DeleteEdge(int u, int v);
