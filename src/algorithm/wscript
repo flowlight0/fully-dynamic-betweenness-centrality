@@ -12,23 +12,23 @@ def build(bld):
         includes = ['../'],
         target  = 'algo_static')
 
-
     bld.stlib(
-        source = [
-            'dynamic_centrality_bms.cpp',
-        ],
+        source = ['dynamic_centrality_naive.cpp',],
+        includes = ['../'],
+        target  = 'algo_naive')
+    
+    bld.stlib(
+        source = ['dynamic_centrality_bms.cpp',],
         includes = ['../'],
         target  = 'algo_bms')
 
     bld.stlib(
         source = [
-            'special_purpose_reachability_index.cpp'
+            'special_purpose_reachability_index.cpp',
+            'dynamic_centrality_hay.cpp',
+            'hyper_edge.cpp'
         ],
         includes = ['../'],
         target  = 'algo_hay')
-    
-
-    
-
     
     

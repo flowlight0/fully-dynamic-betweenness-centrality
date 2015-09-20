@@ -49,3 +49,12 @@ def build(bld):
         lib          = ['pthread'],
         includes     = ['../lib/', '.']
     )
+
+    bld.program(
+        features     = 'test',
+        source       = './cui/dynamic_centrality_hay_test.cpp',
+        target       = '../dynamic_centrality_hay_test',
+        use          = ['algo_static', 'algo_hay', 'algo_naive', 'my_common', 'gtest'],
+        lib          = ['pthread'],
+        includes     = ['../lib/', '.']
+    )

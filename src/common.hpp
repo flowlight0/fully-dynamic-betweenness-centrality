@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <cmath>
 
 #define CHECK(expr)                               \
   if (expr) {                                     \
@@ -15,6 +16,10 @@
 
 #define fst first
 #define snd second
+
+inline bool Equal(double a, double b){
+  return abs(a - b) < 1e-9;
+}
 
 // for debug
 template <typename S, typename T> std::ostream &operator<<(std::ostream &out, const std::pair<S, T> &p) {
@@ -44,14 +49,6 @@ template<typename T> inline void SafeDeleteArray(T* &p){
     delete [] p;
     p = nullptr;
   }
-}
-
-template <typename T> T average(const std::vector<T> &vec){
-  T sum = 0;
-  for (const T &val : vec){
-    sum += val;
-  }
-  return sum / double(vec.size());
 }
 
 #endif /* COMMON_H */
