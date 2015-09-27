@@ -26,7 +26,8 @@ def build(bld):
         source = [
             'special_purpose_reachability_index.cpp',
             'dynamic_centrality_hay.cpp',
-            'hyper_edge.cpp'
+            'hyper_edge.cpp',
+            'id_manager.cpp',
         ],
         includes = ['../'],
         target  = 'algo_hay')

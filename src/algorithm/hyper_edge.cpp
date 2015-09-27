@@ -345,7 +345,7 @@ namespace betweenness_centrality {
     if (!is_connected) return;
     for (const auto p : scores){
       if (p.first != source && p.first != target){
-        dch->total_weight[p.first] += p.second;
+        dch->score[p.first] += p.second;
       }
     }
   }
@@ -354,7 +354,7 @@ namespace betweenness_centrality {
     if (!is_connected) return;
     for (const auto p : scores){
       if (p.first != source && p.first != target){
-        dch->total_weight[p.first] -= p.second;
+        dch->score[p.first] -= p.second;
       }
     }
   }
@@ -554,7 +554,7 @@ namespace betweenness_centrality {
     bool u_in_s = ball_s.HasNode(u), v_in_s = ball_s.HasNode(v);
     bool u_in_t = ball_t.HasNode(u), v_in_t = ball_t.HasNode(v);
     assert(!u_in_s && !u_in_t && !v_in_s && !v_in_t);
-
+    
     vector<int> dag_nodes;
     vector<int> inter_nodes1;
     vector<int> inter_nodes2;

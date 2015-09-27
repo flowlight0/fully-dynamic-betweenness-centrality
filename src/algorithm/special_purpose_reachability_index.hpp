@@ -8,6 +8,7 @@
 #include <numeric>
 #include <iostream>
 #include <sparsehash/dense_hash_map>
+#include "id_manager.hpp"
 using std::vector;
 
 namespace betweenness_centrality {
@@ -21,19 +22,20 @@ namespace betweenness_centrality {
     class SpecialPurposeReachabilityIndex {
     private:
       friend class ReachabilityQuerier;
-    
+      
       vector<int> roots;
       vector<int> reach_mask[2];
       vector<DynamicSPT*> spts[2];
       vector<vector<int> >  *fadj;
       vector<vector<int> >  *badj;
+      IDManager id_manager;
     
       vector<int> temp_array;
       vector<int> has_change;
       vector<int> chg_nodes;
       vector<ReachabilityQuerier*> pr_queriers;
       int num_rs;
-      int num_nodes;
+      int V;
       static const int num_rs_limit = 30;
     
     public:
@@ -51,7 +53,7 @@ namespace betweenness_centrality {
     private: 
       inline int GetOutMask(int v) const { assert(ValidNode(v)); return reach_mask[0][v]; }
       inline int GetInMask(int v) const { assert(ValidNode(v)); return reach_mask[1][v]; }
-      inline bool ValidNode(int v) const { return 0 <= v && v < num_nodes; }
+      inline bool ValidNode(int v) const { return 0 <= v && v < V; }
       const vector<int> *GetRCNodes() const { return &chg_nodes; }
       void CollectRCNodes();
     };

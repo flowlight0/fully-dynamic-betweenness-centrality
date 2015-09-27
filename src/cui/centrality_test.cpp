@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <algorithm>
+#include "gtest/gtest.h"
 #include "algorithm/centrality.hpp"
 using namespace std;
 

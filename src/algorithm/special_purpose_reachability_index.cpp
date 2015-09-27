@@ -486,27 +486,27 @@ namespace betweenness_centrality {
     
   
     SpecialPurposeReachabilityIndex::SpecialPurposeReachabilityIndex(vector<vector<int> >  *fadj, vector<vector<int> >  *badj, int num_rs)
-      : fadj(fadj), badj(badj), num_rs(num_rs)
+      : fadj(fadj), badj(badj), id_manager(fadj->size()), num_rs(num_rs)
     {
       CHECK(fadj != nullptr && badj != nullptr && num_rs <= num_rs_limit);
     
-      num_nodes = fadj->size();
+      V = fadj->size();
       // #ifdef NDEBUG
       // JLOG_ADD_BENCHMARK("spr_index.construct_time"){
       // #endif
-      has_change.resize(num_nodes, false);
-      temp_array.resize(num_nodes, -1);
+      has_change.resize(V, false);
+      temp_array.resize(V, -1);
       for (int i = 0; i < 2; i++){
-        reach_mask[i].resize(num_nodes, 0);
+        reach_mask[i].resize(V, 0);
       }
 
       for (int k = 0; k < num_rs; k++){
-        int root = rand() % num_nodes;
+        int root = rand() % V;
         roots.push_back(root);
         spts[0].push_back(new DynamicSPT(root, fadj, badj));
         spts[1].push_back(new DynamicSPT(root, badj, fadj));
 
-        for (int v = 0; v < num_nodes; v++){
+        for (int v = 0; v < V; v++){
           for (int i = 0; i < 2; i++){
             SetBit(reach_mask[i][v], k, spts[i].back()->GetDistance(v) < INF);
           }
@@ -552,13 +552,13 @@ namespace betweenness_centrality {
         prq->DeleteEdge(u, v);
       }
     }
-
+    
     void SpecialPurposeReachabilityIndex::InsertNode(int u){
-      int new_num_nodes = max(u + 1, num_nodes);
-
+      int new_V = max(u + 1, V);
+      
       // Resize variables
-      if (new_num_nodes > num_nodes){
-        for (; num_nodes < new_num_nodes; num_nodes++){
+      if (new_V > V){
+        for (; V < new_V; V++){
           has_change.push_back(false);
           temp_array.push_back(-1);
 
@@ -574,7 +574,8 @@ namespace betweenness_centrality {
         }
         CollectRCNodes();
       }
-    
+
+      id_manager.MakeAlive(u);
       for (auto prq : pr_queriers){
         CHECK(prq != nullptr);
         prq->InsertNode(u);
@@ -582,19 +583,18 @@ namespace betweenness_centrality {
     }
   
     void SpecialPurposeReachabilityIndex::DeleteNode(int u, const vector<int> &u_out, const vector<int> &u_in){
-      // Check whether "u \in roots"
       CHECK(fadj->at(u).empty() && badj->at(u).empty());
       chg_nodes.clear();
-      // cout << "DELETE: " << u << endl;
-      // cout << "U_OUT:  " << u_out << endl;
-      // cout << "U_IN:   " << u_in  << endl;
+      id_manager.MakeDead(u);
       for (int k = 0; k < num_rs; k++){
         if (roots[k] == u){
-          while (roots[k] == u) roots[k] = rand() % num_nodes;
+          while (roots[k] == u && id_manager.NumAlive()) {
+            roots[k] = id_manager.SampleAlive();
+          }
           spts[0][k]->ChangeRoot(roots[k]);
           spts[1][k]->ChangeRoot(roots[k]);
 
-          for (int v = 0; v < num_nodes; v++){
+          for (int v = 0; v < V; v++){
             for (int i = 0; i < 2; i++){
               SetBit(reach_mask[i][v], k, spts[i][k]->GetDistance(v) < INF);
             }
@@ -605,7 +605,7 @@ namespace betweenness_centrality {
         }
       }
       CollectRCNodes();
-    
+
       for (auto prq : pr_queriers){
         CHECK(prq != nullptr);
         prq->DeleteNode(u, u_out, u_in);
@@ -653,6 +653,7 @@ namespace betweenness_centrality {
     }
   } /* special_purpose_reachability_index */
 } /* dynamic_centrality */
+
 
 
 

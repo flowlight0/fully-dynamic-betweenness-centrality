@@ -12,12 +12,14 @@ class IDManager {
   std::vector<int> pos_in_dead;
 public:
   IDManager(size_t V);
-  void Add();
-  void MakeAlive(int u);
-  void MakeDead(int u);
+  void Add(bool alive = true);
+  bool MakeAlive(int u);
+  bool MakeDead(int u);
   int SampleAlive() const ;
   int SampleDead() const ;
   bool Full() const { return dead_ids.empty(); }
+  size_t Size() const { return pos_in_alive.size(); }
+  size_t NumAlive() const { return alive_ids.size(); }
 };
 
 
