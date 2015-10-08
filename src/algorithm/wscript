@@ -29,7 +29,7 @@ def build(bld):
             'hyper_edge.cpp',
             'id_manager.cpp',
         ],
-        includes = ['../'],
+        includes = ['../', '../../lib'],
         target  = 'algo_hay')
     
     
