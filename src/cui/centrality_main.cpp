@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   
-  CentralityBase *cb = GetAlgorithmFromName(FLAGS_graph_file);
+  CentralityBase *cb = GetAlgorithmFromName(FLAGS_algorithm);
   
   vector<pair<int, int> > es;
   ReadGraph(FLAGS_graph_file, es);
