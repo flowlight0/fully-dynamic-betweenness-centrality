@@ -44,8 +44,8 @@ def build(bld):
     bld.program(
         source       = './cui/centrality_main.cpp',
         target       = '../centrality',
-        use          = ['algo_static', 'algo_naive', 'my_common', 'gtest'],
-        lib          = ['pthread'],
+        use          = ['algo_static', 'algo_naive', 'algo_bms', 'algo_hay', 'my_common', 'gtest'],
+        uselib       = ['common'],
         includes     = ['../lib/', '.']
     )
     
