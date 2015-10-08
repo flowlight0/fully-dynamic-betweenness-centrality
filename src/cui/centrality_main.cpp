@@ -1,8 +1,8 @@
 #include "algorithm/centrality.hpp"
 #include "algorithm/dynamic_centrality_bms.hpp"
 #include "algorithm/dynamic_centrality_hay.hpp"
+#include "gflags/gflags.h"
 #include <iostream>
-#include <gflags/gflags.h>
 using namespace std;
 using namespace betweenness_centrality;
 
