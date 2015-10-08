@@ -3,7 +3,7 @@
 
 #include "common.hpp"
 #include "special_purpose_reachability_index.hpp"
-#include <sparsehash/dense_hash_map>
+#include "sparsehash/dense_hash_map"
 using std::vector;
 
 namespace betweenness_centrality {

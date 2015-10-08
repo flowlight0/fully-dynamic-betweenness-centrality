@@ -13,7 +13,7 @@ def build(bld):
 
     from waflib.Tools import waf_unit_test
     bld.add_post_fun(waf_unit_test.summary)
-
+    
     bld.stlib(
         source = [
             '../lib/gtest/gtest-all.cpp',
@@ -23,48 +23,30 @@ def build(bld):
         includes = '../lib/'
     )
 
-    bld.program(
-        features = 'test',
-        source   = './cui/centrality_test.cpp',
-        target   = '../centrality_test',
-        use      = ['algo_static', 'my_common', 'gtest'],
-        lib      = ['pthread'],
-        includes = ['../lib/', '.']
-    )
+    test_programs = [
+        'centrality_test',
+        'dynamic_centrality_bms_test',
+        'id_manager_test',
+        'special_purpose_reachability_test',
+        'dynamic_centrality_hay_test',
+    ]
 
+    for test_program in test_programs:
+        bld.program(
+            features = 'test',
+            source   = './cui/' + test_program + '.cpp',
+            target   = '../' + test_program,
+            use      = ['algo_static', 'algo_naive', 'algo_bms', 'algo_hay', 'my_common', 'gtest'],
+            lib      = ['pthread'],
+            includes = ['../lib/', '.']
+        )
+        
     bld.program(
-        features     = 'test',
-        source       = './cui/dynamic_centrality_bms_test.cpp',
-        target       = '../dynamic_centrality_bms_test',
-        use          = ['algo_static', 'algo_bms', 'my_common', 'gtest'],
-        lib          = ['pthread'],
-        includes     = ['../lib/', '.']
-    )
-
-    bld.program(
-        features     = 'test',
-        source       = './cui/id_manager_test.cpp',
-        target       = '../id_manager_test',
-        use          = ['algo_hay', 'my_common', 'gtest'],
-        lib          = ['pthread'],
-        includes     = ['../lib/', '.']
-    )
-
-
-    bld.program(
-        features     = 'test',
-        source       = './cui/special_purpose_reachability_test.cpp',
-        target       = '../special_purpose_reachability_test',
-        use          = ['algo_static', 'algo_hay', 'my_common', 'gtest'],
+        source       = './cui/centrality_main.cpp',
+        target       = '../centrality',
+        use          = ['algo_static', 'algo_naive', 'my_common', 'gtest'],
         lib          = ['pthread'],
         includes     = ['../lib/', '.']
     )
     
-    bld.program(
-        features     = 'test',
-        source       = './cui/dynamic_centrality_hay_test.cpp',
-        target       = '../dynamic_centrality_hay_test',
-        use          = ['algo_static', 'algo_hay', 'algo_naive', 'my_common', 'gtest'],
-        lib          = ['pthread'],
-        includes     = ['../lib/', '.']
-    )
+    
