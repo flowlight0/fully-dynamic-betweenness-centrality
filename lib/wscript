@@ -1,0 +1,13 @@
+# -*- python -*-
+
+srcdir= '.'
+blddir= '../bin'
+
+def build(bld):
+    bld.stlib(
+        source = ['gtest/gtest-all.cpp',
+                  'gtest/gtest_main.cc'],
+        target = 'gtest',
+        includes = '.',
+    )
+
