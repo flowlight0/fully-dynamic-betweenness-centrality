@@ -10,19 +10,10 @@ def build(bld):
     bld.stlib(
         source   = ['common.cpp'],
         target   = 'my_common')
-
+    
     from waflib.Tools import waf_unit_test
     bld.add_post_fun(waf_unit_test.summary)
     
-    bld.stlib(
-        source = [
-            '../lib/gtest/gtest-all.cpp',
-            '../lib/gtest/gtest_main.cc'
-        ],
-        target = 'gtest',
-        includes = '../lib/'
-    )
-
     test_programs = [
         'centrality_test',
         'dynamic_centrality_bms_test',
@@ -31,22 +22,25 @@ def build(bld):
         'dynamic_centrality_hay_test',
     ]
 
+    my_lib = ['algo_static', 'algo_naive', 'algo_bms',
+              'algo_hay', 'my_common', 'gtest']
+    
     for test_program in test_programs:
         bld.program(
             features = 'test',
             source   = './cui/' + test_program + '.cpp',
             target   = '../' + test_program,
-            use      = ['algo_static', 'algo_naive', 'algo_bms', 'algo_hay', 'my_common', 'gtest'],
-            lib      = ['pthread'],
+            use      = my_lib,
+            uselib   = ['common'],
             includes = ['../lib/', '.']
         )
         
     bld.program(
         source       = './cui/centrality_main.cpp',
         target       = '../centrality',
-        use          = ['algo_static', 'algo_naive', 'algo_bms', 'algo_hay', 'my_common', 'gtest'],
-        uselib       = ['common'],
-        includes     = ['../lib/', '.']
+        use          = my_lib,
+        uselib       = 'common',
+        stlib        = ['gflags'],
+        stlibpath    = ['lib/gflags'],
+        includes     = ['../lib/', '.'],
     )
-    
-    

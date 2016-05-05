@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-APPNAME= 'spanning_edge_centrality'
+APPNAME= 'fully_dynamic_betweenness_centrality'
 VERSION= '0.0.1'
 
 top = '.'
@@ -14,9 +14,9 @@ def configure(conf):
     conf.load('compiler_cxx')
     conf.check_tool('compiler_cxx')
     conf.env.append_value('CXXFLAGS', ['-Wall', '-Wextra', '-g', '-O3', '-std=c++11', '-Wno-unused-local-typedefs'])
-    conf.check_cxx(lib = ['gflags'], uselib_store = 'common')
     conf.check_cxx(lib = ['pthread'], uselib_store = 'common')
     
 def build(bld):
+    bld.recurse('lib')
     bld.recurse('src')
     
