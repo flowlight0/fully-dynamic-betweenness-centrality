@@ -1,9 +1,8 @@
 #ifndef DYNAMIC_CENTRALITY_BMS_H
 #define DYNAMIC_CENTRALITY_BMS_H
 
-
 #include "common.hpp"
-#include "dynamic_centrality.hpp"
+#include "dynamic_centrality_base.hpp"
 #include <climits>
 #include <cassert>
 #include <algorithm>

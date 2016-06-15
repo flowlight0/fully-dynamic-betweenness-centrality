@@ -1,4 +1,4 @@
-#include "algorithm/dynamic_centrality.hpp"
+#include "algorithm/dynamic_centrality_base.hpp"
 #include "algorithm/dynamic_centrality_hay.hpp"
 #include "algorithm/dynamic_centrality_naive.hpp"
 #include "gtest/gtest.h"

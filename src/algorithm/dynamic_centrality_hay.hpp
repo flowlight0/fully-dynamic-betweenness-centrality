@@ -2,7 +2,7 @@
 #define DYNAMIC_CENTRALITY_HAY_H
 
 #include "common.hpp"
-#include "dynamic_centrality.hpp"
+#include "dynamic_centrality_base.hpp"
 #include "hyper_edge.hpp"
 #include "special_purpose_reachability_index.hpp"
 #include <vector>

@@ -2,7 +2,7 @@
 #define DYNAMIC_CENTRALITY_NAIVE_H
 
 #include "centrality_brandes.hpp"
-#include "dynamic_centrality.hpp"
+#include "dynamic_centrality_base.hpp"
 #include <vector>
 #include <cstdlib>
 using std::vector;

@@ -1,5 +1,5 @@
-#ifndef DYNAMIC_CENTRALITY_H
-#define DYNAMIC_CENTRALITY_H
+#ifndef DYNAMIC_CENTRALITY_BASE_H
+#define DYNAMIC_CENTRALITY_BASE_H
 
 #include "centrality_base.hpp"
 
@@ -15,4 +15,4 @@ namespace betweenness_centrality {
   };
 }
 
-#endif /* DYNAMIC_CENTRALITY_H */
+#endif /* DYNAMIC_CENTRALITY_BASE_H */
