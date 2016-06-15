@@ -12,13 +12,15 @@ using std::pair;
 
 namespace betweenness_centrality {
   typedef vector<int> path_t;
-  typedef char Color;
   constexpr int INF = std::numeric_limits<short>::max() / 2;
-  const Color WHITE = 0;
-  const Color GRAY  = 1;
-  const Color BLACK = 2;
   
   class DynamicShortestPathTree {
+    enum Color {
+      WHITE,
+      GRAY,
+      BLACK,
+    };
+    
     size_t V;
     vector<short> distance;
     vector<float> num_paths;
@@ -29,7 +31,7 @@ namespace betweenness_centrality {
     const vector<vector<int> > *fadj;
     const vector<vector<int> > *badj;
     const bool store_prev;
-    bool  mod;
+    bool  modified;
     
   public:
     DynamicShortestPathTree(int source,
@@ -39,13 +41,13 @@ namespace betweenness_centrality {
     virtual ~DynamicShortestPathTree(){}
     
     void InsertEdge(const vector<pair<int ,int> > &es);
-    void sampleSP(int target, vector<int> &sp);
+    void SampleSP(int target, vector<int> &sp);
     inline int GetDistance(int v) const { return distance[v]; }
     inline double GetNumPaths(int v) const { return num_paths[v]; }
-    inline bool modified() const { return mod; }
+    inline bool Modified() const { return modified; }
   private:
     void Resize();
-    inline bool validNode(int v) { return 0 <= v && (size_t)v < V; }
+    inline bool ValidNode(int v) { return 0 <= v && (size_t)v < V; }
   };
   
   class DynamicCentralityBMS : public DynamicCentralityBase {

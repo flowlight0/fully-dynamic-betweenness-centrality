@@ -58,7 +58,7 @@ namespace betweenness_centrality {
   void DynamicShortestPathTree::InsertEdge(const vector<pair<int, int> > &es){
     Resize();
     
-    mod = false;
+    modified = false;
     short max_dist = 0;
     for (const auto &e: es){
       if (distance[e.fst] < INF) max_dist = max(max_dist, distance[e.fst]);
@@ -81,7 +81,7 @@ namespace betweenness_centrality {
     vector<int> visited;
     for (size_t m = 1; m < queues.size(); m++){
       while (!queues[m].empty()){
-        mod = true;
+        modified = true;
         int v = queues[m].front();
         queues[m].pop();
         
@@ -126,13 +126,13 @@ namespace betweenness_centrality {
     visited.clear();
   }
 
-  void DynamicShortestPathTree::sampleSP(int target, vector<int> &ps){
-    CHECK(validNode(target) && distance[target] != INF);
+  void DynamicShortestPathTree::SampleSP(int target, vector<int> &ps){
+    CHECK(ValidNode(target) && distance[target] != INF);
     ps.clear();
     ps.push_back(target);
     for (int v = target; v != source; ps.push_back(v)){
       vector<pair<int, double> > choices;
-      CHECK(validNode(v));
+      CHECK(ValidNode(v));
       
       if (store_prev){
         for (int w : prev_nodes[v]){
@@ -191,7 +191,7 @@ namespace betweenness_centrality {
       vector<int> sp;
       
       if (spt.GetDistance(targets[i]) != INF){
-        spt.sampleSP(targets[i], sp);
+        spt.SampleSP(targets[i], sp);
       }
 
       for (int v : sp){
@@ -224,9 +224,9 @@ namespace betweenness_centrality {
     CHECK(score.size() == V);
     for (int i = 0; i < num_samples; i++){
       SPTs[i].InsertEdge(es);
-      if (SPTs[i].modified() && SPTs[i].GetDistance(targets[i]) != INF){
+      if (SPTs[i].Modified() && SPTs[i].GetDistance(targets[i]) != INF){
         vector<int> new_sp;
-        SPTs[i].sampleSP(targets[i], new_sp);
+        SPTs[i].SampleSP(targets[i], new_sp);
 
         for (int v : SPs[i]){
           if (v != sources[i] && v != targets[i]) score[v] -= 1.0 / num_samples;
