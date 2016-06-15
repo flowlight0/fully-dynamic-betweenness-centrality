@@ -1,11 +1,11 @@
 #ifndef DYNAMIC_CENTRALITY_H
 #define DYNAMIC_CENTRALITY_H
 
-#include "centrality.hpp"
+#include "centrality_base.hpp"
 
 namespace betweenness_centrality {
   class DynamicCentralityBase
-    : public betweenness_centrality::CentralityBase { 
+    : public CentralityBase { 
   public:
     virtual double QueryCentrality(int v) const = 0;
     virtual void InsertNode(int v) = 0;

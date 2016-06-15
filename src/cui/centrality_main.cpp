@@ -1,4 +1,6 @@
-#include "algorithm/centrality.hpp"
+#include "algorithm/centrality_base.hpp"
+#include "algorithm/centrality_brandes.hpp"
+#include "algorithm/centrality_sampling.hpp"
 #include "algorithm/dynamic_centrality_bms.hpp"
 #include "algorithm/dynamic_centrality_hay.hpp"
 #include "gflags/gflags.h"
@@ -8,15 +10,15 @@ using namespace betweenness_centrality;
 
 DEFINE_string(graph_file, "-", "input graph file.");
 DEFINE_string(query_file, "-", "input query file.");
-DEFINE_string(algorithm, "naive", "naive, sample, bms, or hay");
+DEFINE_string(algorithm, "brandes", "brandes, sampling, bms, or hay");
 DEFINE_int32(num_samples, 1000, "the number of samples used to estimate centrality values.");
 
 
 CentralityBase *GetAlgorithmFromName(const string &algo_name){
-  if (algo_name == "naive"){
-    return new CentralityNaive();
-  } else if (algo_name == "sample"){
-    return new CentralitySample();
+  if (algo_name == "brandes"){
+    return new CentralityBrandes();
+  } else if (algo_name == "sampling"){
+    return new CentralitySampling();
   } else if (algo_name == "bms"){
     return new DynamicCentralityBMS();
   } else if (algo_name == "hay"){

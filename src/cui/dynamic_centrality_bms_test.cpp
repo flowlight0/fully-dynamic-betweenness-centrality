@@ -1,3 +1,4 @@
+#include "algorithm/centrality_brandes.hpp"
 #include "algorithm/dynamic_centrality_bms.hpp"
 #include "common.hpp"
 #include "gtest/gtest.h"
@@ -38,7 +39,7 @@ template <typename S, typename T> void CheckAccuracy(int V, S *a, T *b, double t
 
 
 void CheckStatic(int V, const vector<pair<int, int> > &es){
-  auto *a = new CentralityNaive();
+  auto *a = new CentralityBrandes();
   auto *b = new DynamicCentralityBMS();
   a->PreCompute(es);
   b->PreCompute(es, 10000);
@@ -75,7 +76,7 @@ TEST(BMS_ON_HAND_SMALL0, INSERT){
     es.emplace_back(v, v);
   }
          
-  auto *a = new CentralityNaive();
+  auto *a = new CentralityBrandes();
   auto *b = new DynamicCentralityBMS();
 
   b->PreCompute(es, 10000);
@@ -102,7 +103,7 @@ TEST(BMS_ON_GRID_SMALL0, INSERT){
   std::random_shuffle(es.begin(), es.end());
   
   for (int batch_size = 1; batch_size < 10; batch_size++){
-    auto *a = new CentralityNaive();
+    auto *a = new CentralityBrandes();
     auto *b = new DynamicCentralityBMS();
     a->PreCompute(start_es);
     b->PreCompute(start_es, 4000);

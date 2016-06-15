@@ -2,14 +2,14 @@
 #define CENTRALITY_SAMPLE_H
 
 #include "common.hpp"
-#include "centrality.hpp"
+#include "centrality_sampling.hpp"
 #include <cassert>
 #include <queue>
 #include <algorithm>
 using namespace std;
 
 namespace betweenness_centrality {
-  void CentralitySample::
+  void CentralitySampling::
   PreCompute(const vector<pair<int, int> > &es, int num_samples){
     BuildGraph(es);
     centrality_map = vector<double>(V, 0);
@@ -52,7 +52,7 @@ namespace betweenness_centrality {
     }
   }
 
-  vector<int> CentralitySample::
+  vector<int> CentralitySampling::
   ComputeDAG(int source, int target){
     if (source == target) return vector<int>(1, source);
 
@@ -131,7 +131,7 @@ namespace betweenness_centrality {
     return DAG_vertices;
   }
 
-  void CentralitySample::
+  void CentralitySampling::
   BreadthFirstSearchOnDAG(int source, Direction dir){
     assert(temp_on_DAG[source]);
     auto &distance    = temp_distance [dir];

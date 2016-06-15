@@ -6,8 +6,9 @@ blddir= '../../bin'
 def build(bld):
     bld.stlib(
         source = [
-            'centrality.cpp',
-            'centrality_sample.cpp',
+            'centrality_base.cpp',
+            'centrality_brandes.cpp',
+            'centrality_sampling.cpp',
         ],
         includes = ['../'],
         target  = 'algo_static')

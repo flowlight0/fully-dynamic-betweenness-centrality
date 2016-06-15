@@ -1,7 +1,7 @@
 #ifndef DYNAMIC_CENTRALITY_NAIVE_H
 #define DYNAMIC_CENTRALITY_NAIVE_H
 
-#include "centrality.hpp"
+#include "centrality_brandes.hpp"
 #include "dynamic_centrality.hpp"
 #include <vector>
 #include <cstdlib>
@@ -12,7 +12,7 @@ namespace betweenness_centrality {
 
   class DynamicCentralityNaive : public DynamicCentralityBase {
     vector<pair<int, int> > es;
-    CentralityNaive cn;
+    CentralityBrandes cn;
   
   public:
     void PreCompute(const vector<pair<int, int> > &es, int num_samples = -1);
