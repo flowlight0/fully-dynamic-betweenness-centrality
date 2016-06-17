@@ -36,8 +36,8 @@ def build(bld):
         )
         
     bld.program(
-        source       = './cui/centrality_main.cpp',
-        target       = '../centrality',
+        source       = './cui/dynamic_centrality_main.cpp',
+        target       = '../dynamic_centrality',
         use          = my_lib,
         uselib       = 'common',
         stlib        = ['gflags'],

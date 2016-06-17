@@ -1,0 +1,29 @@
+Q 0
+Q 1
+Q 2
+Q 3
+Q 4
+VI 5
+EI 4 5
+VI 6
+VI 7
+EI 5 6
+EI 6 7
+EI 3 1
+Q 0
+Q 1
+Q 2
+Q 3
+Q 4
+Q 5
+Q 6
+Q 7
+VD 5
+VD 6
+VD 7
+ED 3 1
+Q 0
+Q 1
+Q 2
+Q 3
+Q 4
