@@ -1,6 +1,7 @@
 Fully Dynamic Approximate Betweenness Centrality
 ==============================
-This is an implementation of fully dynamic betweenness centrality maintainance method (VLDB '16). 
+This is an implementation of fully dynamic betweenness centrality maintainance method (VLDB '16). This implementation enables you to efficiently maintain approximate betweenness centrality values on large-scale complex networks (social networks, web graphs, co-author networks). If you have interest in our method and experimental results, please see [our paper](http://www.vldb.org/pvldb/vol9/p48-hayashi.pdf).
+
 ## Usage
 ### From Your Program
 Please see [src/cui/dynamic_centrality_main.cpp](https://github.com/flowlight0/fully-dynamic-betweenness-centrality/blob/master/src/cui/dynamic_centrality_main.cpp), which is am example usage of our implementation. 
