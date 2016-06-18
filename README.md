@@ -48,3 +48,6 @@ Under construction
 
 ## Reference 
 Takanori Hayashi, Takuya Akiba, and Yuichi Yoshida. [**Fully dynamic betweenness centrality maintenance on massive networks**](http://www.vldb.org/pvldb/vol9/p48-hayashi.pdf).  [*VLDB'16*](http://vldb2016.persistent.com/)
+
+## Contact 
+If you have questions or find errors, please contact to me (flowlight0 at gmail.com)
