@@ -37,21 +37,35 @@
 #ifndef GFLAGS_DECLARE_H_
 #define GFLAGS_DECLARE_H_
 
+
+// ---------------------------------------------------------------------------
+// Namespace of gflags library symbols.
+#define GFLAGS_NAMESPACE google
+
 // ---------------------------------------------------------------------------
 // Windows DLL import/export.
 
-// We always want to import the symbols of the gflags library
+// Whether gflags library is a DLL.
+//
+// Set to 1 by default when the shared gflags library was built on Windows.
+// Must be overwritten when this header file is used with the optionally also
+// built static library instead; set by CMake's INTERFACE_COMPILE_DEFINITIONS.
+#ifndef GFLAGS_IS_A_DLL
+#  define GFLAGS_IS_A_DLL 0
+#endif
+
+// We always want to import the symbols of the gflags library.
 #ifndef GFLAGS_DLL_DECL
-#  if 0 && defined(_MSC_VER)
+#  if GFLAGS_IS_A_DLL && defined(_MSC_VER)
 #    define GFLAGS_DLL_DECL __declspec(dllimport)
 #  else
 #    define GFLAGS_DLL_DECL
 #  endif
 #endif
 
-// We always want to import variables declared in user code
+// We always want to import variables declared in user code.
 #ifndef GFLAGS_DLL_DECLARE_FLAG
-#  ifdef _MSC_VER
+#  if GFLAGS_IS_A_DLL && defined(_MSC_VER)
 #    define GFLAGS_DLL_DECLARE_FLAG __declspec(dllimport)
 #  else
 #    define GFLAGS_DLL_DECLARE_FLAG
@@ -69,7 +83,7 @@
 #  include <inttypes.h>                 // a third place for uint32_t or u_int32_t
 #endif
 
-namespace gflags {
+namespace GFLAGS_NAMESPACE {
 
 #if 1 // C99
 typedef int32_t          int32;
@@ -90,7 +104,7 @@ typedef unsigned __int64 uint64;
 #  error Do not know how to define a 32-bit integer quantity on your system
 #endif
 
-} // namespace gflags
+} // namespace GFLAGS_NAMESPACE
 
 
 namespace fLS {
@@ -113,13 +127,16 @@ typedef std::string clstring;
   DECLARE_VARIABLE(bool, B, name)
 
 #define DECLARE_int32(name) \
-  DECLARE_VARIABLE(::gflags::int32, I, name)
+  DECLARE_VARIABLE(::GFLAGS_NAMESPACE::int32, I, name)
+
+#define DECLARE_uint32(name) \
+  DECLARE_VARIABLE(::GFLAGS_NAMESPACE::uint32, U, name)
 
 #define DECLARE_int64(name) \
-  DECLARE_VARIABLE(::gflags::int64, I64, name)
+  DECLARE_VARIABLE(::GFLAGS_NAMESPACE::int64, I64, name)
 
 #define DECLARE_uint64(name) \
-  DECLARE_VARIABLE(::gflags::uint64, U64, name)
+  DECLARE_VARIABLE(::GFLAGS_NAMESPACE::uint64, U64, name)
 
 #define DECLARE_double(name) \
   DECLARE_VARIABLE(double, D, name)
@@ -127,7 +144,6 @@ typedef std::string clstring;
 #define DECLARE_string(name) \
   /* We always want to import declared variables, dll or no */ \
   namespace fLS { \
-  using ::fLS::clstring; \
   extern GFLAGS_DLL_DECLARE_FLAG ::fLS::clstring& FLAGS_##name; \
   } \
   using fLS::FLAGS_##name

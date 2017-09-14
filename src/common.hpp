@@ -18,7 +18,7 @@
 #define snd second
 
 inline bool Equal(double a, double b){
-  return abs(a - b) < 1e-9;
+  return fabs(a - b) < 1e-9;
 }
 
 // for debug

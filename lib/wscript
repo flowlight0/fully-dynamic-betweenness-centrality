@@ -11,3 +11,10 @@ def build(bld):
         includes = '.',
     )
 
+    bld.stlib(
+        source = ['gflags/gflags.cc',
+                  'gflags/gflags_completions.cc',
+                  'gflags/gflags_reporting.cc'],
+        target = 'gflags',
+        includes = '.',
+    )
