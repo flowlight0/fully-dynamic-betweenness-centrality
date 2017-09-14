@@ -9,7 +9,7 @@ Please see [src/cui/dynamic_centrality_main.cpp](https://github.com/flowlight0/f
 #### Preparation
 Include [src/algorithm/dynamic_centrality_hay.hpp](https://github.com/flowlight0/fully-dynamic-betweenness-centrality/blob/master/src/algorithm/dynamic_centrality_hay.hpp) and compile your code with several c++ file in this repository. For example, we can compile [src/cui/dynamic_centrality_main.cpp](https://github.com/flowlight0/fully-dynamic-betweenness-centrality/blob/master/src/cui/dynamic_centrality_main.cpp) with g++ and run this program as follows. From the following example, you will see approximate betweenness centrality of vertices in a sample graph. 
 
-    $ g++ -std=c++11 -Isrc -Ilib src/cui/dynamic_centrality_main.cpp src/algorithm/*.cpp src/common.cpp  -Llib -lgflags -lpthread -o main
+    $ g++ -std=c++11 -Isrc -Ilib src/cui/dynamic_centrality_main.cpp src/algorithm/*.cpp src/common.cpp  -Lbin/lib -lgflags -lpthread -o main
     $ ./main --graph_file=sample/sample.graph --query_file=sample/sample.query --num_samples=10000
     0
     0
